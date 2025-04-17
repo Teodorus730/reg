@@ -1,0 +1,5 @@
+<h1>Welcome, {{ user.username }}</h1>
+{% if user.is_admin %}
+  <a href="{{ url_for('auth.create_user') }}">Create User</a><br>
+{% endif %}
+<a href="{{ url_for('auth.logout') }}">Logout</a>

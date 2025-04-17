@@ -1,0 +1,8 @@
+<h1>Create New User</h1>
+<form method="post">
+  {{ form.hidden_tag() }}
+  {{ form.username.label }} {{ form.username() }}<br>
+  {{ form.password.label }} {{ form.password() }}<br>
+  {{ form.is_admin.label }} {{ form.is_admin() }}<br>
+  {{ form.submit() }}
+</form>
