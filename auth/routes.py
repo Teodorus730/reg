@@ -12,7 +12,7 @@ def login():
         user = Users.query.filter_by(username=form.username.data).first()
         if user and user.check_password(form.password.data):
             login_user(user)
-            return redirect(url_for("dashboard"))
+            return redirect(url_for("client.dashboard"))
         flash("Invalid credentials")
     return render_template("login.html", form=form)
 
@@ -27,7 +27,7 @@ def logout():
 def create_user():
     if not current_user.is_admin:
         flash("Access denied")
-        return redirect(url_for("dashboard"))
+        return redirect(url_for("client.dashboard"))
 
     form = CreateUserForm()
     if form.validate_on_submit():
@@ -39,5 +39,5 @@ def create_user():
             db.session.add(new_user)
             db.session.commit()
             flash("User created")
-            return redirect(url_for("dashboard"))
+            return redirect(url_for("client.dashboard"))
     return render_template("create_user.html", form=form)

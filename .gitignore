@@ -174,5 +174,5 @@ cython_debug/
 .pypirc
 
 # project
-music/
-add_admin.py
+files/
+plans.txt

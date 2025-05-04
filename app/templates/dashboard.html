@@ -2,6 +2,8 @@
 {% if user.is_admin %}
   <a href="{{ url_for('auth.create_user') }}">Create User</a><br>
 {% endif %}
-<a href="{{ url_for('upload.load') }}">Release</a>
+<a href="{{ url_for('client.create_release') }}">Create release</a>
+</br>
+<a href="{{ url_for('client.releases') }}">Releases</a>
 </br>
 <a href="{{ url_for('auth.logout') }}">Logout</a>

@@ -12,3 +12,4 @@ class CreateUserForm(FlaskForm):
     password = PasswordField("Password", validators=[DataRequired()])
     is_admin = BooleanField("Is Admin")
     submit = SubmitField("Create User")
+    
