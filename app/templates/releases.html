@@ -29,6 +29,17 @@
                     <p><strong>Дата релиза:</strong> {{ release.release_date or "Не указана" }}</p>
                     <p><strong>Жанр:</strong> {{ release.genre or "Не указан" }}</p>
                     <p><strong>Тип:</strong> {{ release.release_type or "Не указан" }}</p>
+                    <p><strong>Статус:</strong>
+                        {% if release.status == 0 %}
+                            Отклонен
+                        {% elif release.status == 1 %}
+                            На рассмотрении
+                        {% elif release.status == 2 %}
+                            Одобрен
+                        {% elif release.status == 3 %}
+                            Опубликован
+                        {% endif %}
+                    </p>
 
                     <h3>Треки:</h3>
                     <div class="track-list">
@@ -49,5 +60,6 @@
     {% else %}
         <p>У вас пока нет релизов.</p>
     {% endif %}
+    <a href="{{ url_for('client.dashboard') }}">⬅ Назад</a>
 </body>
 </html>

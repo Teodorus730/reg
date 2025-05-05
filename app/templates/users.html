@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Пользователи</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { border-collapse: collapse; width: 100%; margin-bottom: 30px; }
+        th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+        form { display: inline-block; margin: 0; }
+        button { padding: 5px 10px; }
+    </style>
+</head>
+<body>
+    <h1>Управление пользователями</h1>
+
+    <table>
+        <tr>
+            <th>Имя</th>
+            <th>Роль</th>
+            <th>Действия</th>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.username }}</td>
+            <td>
+                <form method="post">
+                    <input type="hidden" name="action" value="update">
+                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                    <select name="user_type">
+                        <option value="admin" {% if user.user_type == 'admin' %}selected{% endif %}>Админ</option>
+                        <option value="moder" {% if user.user_type == 'moder' %}selected{% endif %}>Модератор</option>
+                        <option value="artist" {% if user.user_type == 'artist' %}selected{% endif %}>Артист</option>
+                        <option value="sub" {% if user.user_type == 'sub' %}selected{% endif %}>Саб аккаунт</option>
+                    </select>
+            </td>
+            <td>
+                    <button type="submit">Сохранить</button>
+                </form>
+                {% if current_user.id != user.id %}
+                <form method="post" style="margin-top:5px;">
+                    <input type="hidden" name="action" value="delete">
+                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                    <button type="submit" onclick="return confirm('Удалить пользователя {{ user.username }}?')">Удалить</button>
+                </form>
+                {% else %}
+                    <em>Вы</em>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <a href="{{ url_for('client.dashboard') }}">⬅ Назад</a>
+</body>
+</html>

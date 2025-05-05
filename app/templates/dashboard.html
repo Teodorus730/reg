@@ -1,9 +1,20 @@
 <h1>Welcome, {{ user.username }}</h1>
 {% if user.is_admin %}
-  <a href="{{ url_for('auth.create_user') }}">Create User</a><br>
+  <a href="{{ url_for('admin.create_user') }}">Создать пользователя</a><br>
 {% endif %}
-<a href="{{ url_for('client.create_release') }}">Create release</a>
-</br>
-<a href="{{ url_for('client.releases') }}">Releases</a>
-</br>
+
+{% if user.is_admin %}
+  <a href="{{ url_for('admin.users') }}">Все пользователи</a><br>
+{% endif %}
+
+{% if user.is_artist or user.is_sub %}
+  <a href="{{ url_for('client.create_release') }}">Создать релиз</a></br>
+  <a href="{{ url_for('client.releases') }}">Мои релизы</a></br>
+{% endif %}
+
+{% if user.is_artist %}
+  <a href="{{ url_for('client.create_sub') }}">Создать саб аккаунт</a></br>
+  <a href="{{ url_for('client.subs') }}">Мои саб аккаунты</a></br>
+{% endif %}
+
 <a href="{{ url_for('auth.logout') }}">Logout</a>

@@ -1,9 +1,8 @@
-<h1>Создание пользователя</h1>
+<h1>Создание саб аккаунта</h1>
 <form method="post">
   {{ form.hidden_tag() }}
   {{ form.username.label }} {{ form.username() }}<br>
   {{ form.password.label }} {{ form.password() }}<br>
-  {{ form.user_type.label }} {{ form.user_type() }}<br>
   {{ form.submit() }}
 </form>
 <a href="{{ url_for('client.dashboard') }}">⬅ Назад</a>

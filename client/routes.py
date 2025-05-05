@@ -3,8 +3,8 @@ import uuid
 from flask import Blueprint, render_template, redirect, request, url_for, flash, abort, send_from_directory
 from flask_login import login_required, current_user
 from werkzeug.utils import safe_join
-from models import db, Release, Track
-from client.forms import ReleaseForm
+from models import db, Release, Track, Users
+from client.forms import ReleaseForm, CreateSubForm
 
 client = Blueprint("client", __name__)
 UPLOAD_FOLDER = "files"  # Это относительная папка в корне проекта
@@ -35,6 +35,9 @@ def uploaded_file(filename):
 @client.route("/releases")
 @login_required
 def releases():
+    if not (current_user.is_artist or current_user.is_sub):
+        flash("Access denied")
+        return redirect(url_for("client.dashboard"))
     releases = Release.query.filter_by(user_id=current_user.id).all()
     return render_template("releases.html", releases=releases)
 
@@ -42,6 +45,10 @@ def releases():
 @client.route("/create_release", methods=["GET", "POST"])
 @login_required
 def create_release():
+    if not (current_user.is_artist or current_user.is_sub):
+        flash("Access denied")
+        return redirect(url_for("client.dashboard"))
+    
     form = ReleaseForm()
 
     if request.method == "POST" and form.validate_on_submit():
@@ -65,8 +72,9 @@ def create_release():
             release_type=form.release_type.data,
             release_date=form.release_date.data,
             upc=form.upc.data,
-            cover_path=cover_rel_path,  # относительный путь
-            user_id=current_user.id
+            cover_path=cover_rel_path,  
+            user_id=current_user.id,
+            status=1
         )
         db.session.add(release)
         db.session.commit()
@@ -112,3 +120,55 @@ def create_release():
         return redirect(url_for("client.dashboard"))
 
     return render_template("create_release.html", form=form)
+
+
+@client.route("/subs", methods=["GET", "POST"])
+@login_required
+def subs():
+    if not current_user.is_artist:
+        flash("Access denied")
+        return redirect(url_for("client.dashboard"))
+
+    if request.method == "POST":
+        action = request.form.get("action")
+        user_id = request.form.get("user_id")
+        user = Users.query.get(user_id)
+
+        if not user or user.creator_id != current_user.id:
+            flash("Нет доступа к этому аккаунту.")
+            return redirect(url_for("client.subs"))
+
+        if action == "delete":
+            db.session.delete(user)
+            db.session.commit()
+            flash(f"Саб аккаунт {user.username} удалён.")
+
+    users = Users.query.filter_by(creator_id=current_user.id).all()
+    return render_template("subs.html", users=users)
+
+
+
+@client.route("/create_subaccount", methods=["GET", "POST"])
+@login_required
+def create_sub():
+    if not current_user.is_artist:
+        flash("Access denied")
+        return redirect(url_for("client.dashboard"))
+
+    form = CreateSubForm()
+    if form.validate_on_submit():
+        if Users.query.filter_by(username=form.username.data).first():
+            flash("Пользователь уже существует.")
+        else:
+            new_user = Users(
+                username=form.username.data,
+                user_type="sub",
+                creator_id=current_user.id,
+            )
+            new_user.set_password(form.password.data)
+            db.session.add(new_user)
+            db.session.commit()
+            flash("Саб аккаунт создан.")
+            return redirect(url_for("client.subs"))
+    return render_template("create_sub.html", form=form)
+

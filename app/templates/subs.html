@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Мои саб аккаунты</title>
+</head>
+<body>
+    <h1>Саб аккаунты</h1>
+    <table>
+        <tr><th>Имя</th><th>Действия</th></tr>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.username }}</td>
+            <td>
+                <form method="post">
+                    <input type="hidden" name="action" value="delete">
+                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                    <button type="submit" onclick="return confirm('Удалить {{ user.username }}?')">Удалить</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <a href="{{ url_for('client.create_sub') }}">Создать новый саб аккаунт</a><br>
+    <a href="{{ url_for('client.dashboard') }}">⬅ Назад</a>
+</body>
+</html>

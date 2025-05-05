@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField, BooleanField, DateField, FieldList, FormField, SubmitField
-from wtforms.validators import DataRequired, Optional
+from wtforms import StringField, SelectField, BooleanField, DateField, FieldList, FormField, SubmitField, PasswordField
+from wtforms.validators import DataRequired, Optional, Length
 from flask_wtf.file import FileField, FileAllowed
 
 class TrackForm(FlaskForm):
@@ -33,3 +33,9 @@ class ReleaseForm(FlaskForm):
 
     tracks = FieldList(FormField(TrackForm), min_entries=0)
     submit = SubmitField("Создать релиз")
+    
+    
+class CreateSubForm(FlaskForm):
+    username = StringField("Новое имя пользователя", validators=[DataRequired(), Length(min=3, max=64)])
+    password = PasswordField("Пароль", validators=[DataRequired()])
+    submit = SubmitField("Создать пользователя")
