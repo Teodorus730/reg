@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Все пользователи</title>
+</head>
+<body>
+    <h1>Список пользователей</h1>
+
+    <form method="get">
+        <label>Фильтр по типу:
+            <select name="user_type" onchange="this.form.submit()">
+                <option value="">Все</option>
+                <option value="admin" {% if type_filter == 'admin' %}selected{% endif %}>admin</option>
+                <option value="moder" {% if type_filter == 'moder' %}selected{% endif %}>moder</option>
+                <option value="artist" {% if type_filter == 'artist' %}selected{% endif %}>artist</option>
+                <option value="sub" {% if type_filter == 'sub' %}selected{% endif %}>sub</option>
+            </select>
+        </label>
+    </form>
+
+    <ul>
+        {% for user in users %}
+            <li>
+                <strong>{{ user.username }}</strong> —
+                <strong>{{ user.user_type }}</strong> —
+                <a href="{{ url_for('admin.user_detail', user_id=user.id) }}">Изменить</a>
+            </li>
+        {% else %}
+            <li>Нет пользователей.</li>
+        {% endfor %}
+    </ul>
+
+    <a href="{{ url_for('client.dashboard') }}">⬅ Назад</a>
+</body>
+</html>

@@ -5,41 +5,58 @@ from admin.forms import CreateUserForm
 
 admin = Blueprint("admin", __name__)
 
-@admin.route("/users", methods=["GET", "POST"])
+# @admin.route("/users", methods=["GET", "POST"])
+# @login_required
+# def users():
+#     if not current_user.is_admin:
+#         flash("Access denied")
+#         return redirect(url_for("client.dashboard"))
+
+#     if request.method == "POST":
+#         action = request.form.get("action")
+#         user_id = request.form.get("user_id")
+#         user = Users.query.get(user_id)
+#         if not user:
+#             flash("User not found")
+#             return redirect(url_for("admin.users"))
+
+#         if action == "delete":
+#             if user.id == current_user.id:
+#                 flash("You cannot delete yourself.")
+#                 return redirect(url_for("admin.users"))
+
+#             db.session.delete(user)
+#             db.session.commit()
+#             flash(f"User {user.username} deleted.")
+
+#         elif action == "update":
+#             new_role = request.form.get("user_type")
+#             if new_role not in ("admin", "moder", "artist", "sub"):
+#                 flash("Invalid role.")
+#             else:
+#                 user.user_type = new_role
+#                 db.session.commit()
+#                 flash(f"Role updated for {user.username}.")
+
+#     users = Users.query.all()
+#     return render_template("users.html", users=users)
+
+
+@admin.route('/all_users')
 @login_required
-def users():
-    if not current_user.is_admin:
+def all_users():
+    if not (current_user.is_admin):
         flash("Access denied")
         return redirect(url_for("client.dashboard"))
+    
+    type_filter = request.args.get("user_type")
+    query = Users.query
 
-    if request.method == "POST":
-        action = request.form.get("action")
-        user_id = request.form.get("user_id")
-        user = Users.query.get(user_id)
-        if not user:
-            flash("User not found")
-            return redirect(url_for("admin.users"))
+    if type_filter is not None and type_filter.isdigit():
+        query = query.filter_by(user_type=type_filter)
 
-        if action == "delete":
-            if user.id == current_user.id:
-                flash("You cannot delete yourself.")
-                return redirect(url_for("admin.users"))
-
-            db.session.delete(user)
-            db.session.commit()
-            flash(f"User {user.username} deleted.")
-
-        elif action == "update":
-            new_role = request.form.get("user_type")
-            if new_role not in ("admin", "moder", "artist", "sub"):
-                flash("Invalid role.")
-            else:
-                user.user_type = new_role
-                db.session.commit()
-                flash(f"Role updated for {user.username}.")
-
-    users = Users.query.all()
-    return render_template("users.html", users=users)
+    users = query.order_by(Users.id.desc()).all()
+    return render_template("all_users.html", users=users, type_filter=type_filter)
 
 
 
@@ -66,3 +83,45 @@ def create_user():
             flash("User created")
             return redirect(url_for("admin.users"))
     return render_template("create_user.html", form=form)
+
+
+@admin.route('/users/<int:user_id>', methods=["GET", "POST"])
+@login_required
+def user_detail(user_id):
+    if not current_user.is_admin:
+        flash("Access denied")
+        return redirect(url_for("client.dashboard"))
+
+    user = Users.query.get_or_404(user_id)
+
+    if request.method == "POST":
+        action = request.form.get("action")
+
+        if action == "update_type":
+            new_type = request.form.get("user_type")
+            if new_type and new_type in ["admin", "moder", "artist", "sub"]:
+                user.user_type = new_type
+                db.session.commit()
+                flash("Тип обновлён", "success")
+            else:
+                flash("Недопустимый тип", "error")
+
+        elif action == "update_password":
+            new_password = request.form.get("password")
+            if new_password:
+                user.set_password(new_password)
+                db.session.commit()
+                flash("Пароль обновлён", "success")
+            else:
+                flash("Недопустимый пароль", "error")
+
+        elif action == "update_username":
+            new_username = request.form.get("username")
+            if new_username:
+                user.username = new_username
+                db.session.commit()
+                flash("Юзернейм обновлён", "success")
+            else:
+                flash("Недопустимый юзернейм", "error")
+
+    return render_template("user_detail.html", user=user)

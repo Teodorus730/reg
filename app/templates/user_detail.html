@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Изменить юзера</title>
+</head>
+<body>
+    <h1>Изменить юзера {{ user.username }}</h1>
+
+    <!-- Изменение ника -->
+    <form method="post">
+        <input type="hidden" name="action" value="update_username">
+        <label><strong>Изменить юзернейм:</strong>
+            <input type="text" name="username" value="{{ user.username or '' }}">
+        </label>
+        <button type="submit">Сохранить</button>
+    </form>
+    <br>
+
+    <!-- Изменение пароля -->
+    <form method="post">
+        <input type="hidden" name="action" value="update_password">
+        <label><strong>Изменить пароль:</strong><br>
+            <input type="text" name="password">
+        </label><br>
+        <button type="submit">Сохранить</button>
+    </form>
+    <br>
+
+    <!-- Изменение типа -->
+    <form method="post">
+        <input type="hidden" name="action" value="update_type">
+        <label><strong>Статус:</strong>
+            <select name="user_type">
+                <option value="admin" {% if user.user_type == 'admin' %}selected{% endif %}>admin</option>
+                <option value="moder" {% if user.user_type == 'moder' %}selected{% endif %}>moder</option>
+                <option value="artist" {% if user.user_type == 'artist' %}selected{% endif %}>artist</option>
+                <option value="sub" {% if user.user_type == 'sub' %}selected{% endif %}>sub</option>
+            </select>
+        </label>
+        <button type="submit">Сохранить</button>
+    </form>
+    <br>
+    
+    {% if user.user_type == "artist" %}
+        <h1>Сабаккаунты</h1>
+
+        <ul>
+            {% for sub in user.sub_accounts %}
+                <li>
+                    <strong>{{ sub.username }}</strong> —
+                    <a href="{{ url_for('admin.user_detail', user_id=sub.id) }}">Изменить</a>
+                </li>
+            {% else %}
+                <li>Нет сабаккаунтов.</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+
+<a href="{{ url_for('admin.all_users') }}">⬅ Назад к списку юзеров</a>
+</body>
+</html>

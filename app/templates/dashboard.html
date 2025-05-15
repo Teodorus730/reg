@@ -4,7 +4,7 @@
 {% endif %}
 
 {% if user.is_admin %}
-  <a href="{{ url_for('admin.users') }}">Все пользователи</a><br>
+  <a href="{{ url_for('admin.all_users') }}">Все пользователи</a><br>
 {% endif %}
 
 {% if user.is_artist or user.is_sub %}

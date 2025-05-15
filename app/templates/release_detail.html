@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>{{ release.title }} — Детали релиза</title>
+    <title>Детали релиза</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
         .release { border: 1px solid #ccc; border-radius: 10px; padding: 15px; margin-bottom: 20px; display: flex; gap: 15px; }
@@ -14,7 +14,7 @@
     </style>
 </head>
 <body>
-<h1>{{ release.title }} — Информация о релизе</h1>
+<h1>Информация о релизе {{ release.title }}</h1>
 
 <div class="release">
     {% if release.cover_path %}
@@ -40,7 +40,7 @@
             <label><strong>UPC:</strong>
                 <input type="text" name="upc" value="{{ release.upc or '' }}">
             </label>
-            <button type="submit">Сохранить UPC</button>
+            <button type="submit">Сохранить</button>
         </form>
         <br>
 
@@ -50,7 +50,7 @@
             <label><strong>Ответ модератора:</strong><br>
                 <textarea name="answer" rows="4" cols="50">{{ release.answer or '' }}</textarea>
             </label><br>
-            <button type="submit">Сохранить ответ</button>
+            <button type="submit">Сохранить</button>
         </form>
         <br>
 
@@ -65,7 +65,7 @@
                     <option value="3" {% if release.status == 3 %}selected{% endif %}>Опубликован</option>
                 </select>
             </label>
-            <button type="submit">Сохранить статус</button>
+            <button type="submit">Сохранить</button>
         </form>
         <br>
         
