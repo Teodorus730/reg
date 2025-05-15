@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ release.title }} — Детали релиза</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .release { border: 1px solid #ccc; border-radius: 10px; padding: 15px; margin-bottom: 20px; display: flex; gap: 15px; }
+        .cover { width: 150px; height: 150px; object-fit: cover; border-radius: 8px; border: 1px solid #aaa; }
+        .release-info { flex-grow: 1; }
+        .release h2 { margin: 0 0 10px; }
+        .track-list { margin-left: 20px; }
+        .track { margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+<h1>{{ release.title }} — Информация о релизе</h1>
+
+<div class="release">
+    {% if release.cover_path %}
+        <img src="{{ url_for('client.uploaded_file', filename=release.cover_path) }}" alt="Обложка" class="cover">
+    {% else %}
+        <img src="{{ url_for('static', filename='img/placeholder.png') }}" alt="Без обложки" class="cover">
+    {% endif %}
+    <div class="release-info">
+        <p><strong>Версия:</strong> {{ release.version or "Не указана" }}</p>
+        <p><strong>Артисты:</strong> {{ release.main_artists or "-" }}</p>
+        <p><strong>Доп Артисты:</strong> {{ release.featured_artists or "-" }}</p>
+        <p><strong>Жанр:</strong> {{ release.genre or "Не указан" }}</p>
+        <p><strong>Тип:</strong> {{ release.release_type or "Не указан" }}</p>
+        <p><strong>Дата релиза:</strong> {{ release.release_date or "Не указана" }}</p>
+        <p><strong>Копирайт:</strong> {{ release.copyright or "-" }}</p>
+        <p><strong>Пользователь:</strong> {{ release.user.username }}</p>
+        <p><strong>Комментарий:</strong> {{ release.comment or "-"}}</p>
+
+
+        <!-- Изменение UPC -->
+        <form method="post">
+            <input type="hidden" name="action" value="update_upc">
+            <label><strong>UPC:</strong>
+                <input type="text" name="upc" value="{{ release.upc or '' }}">
+            </label>
+            <button type="submit">Сохранить UPC</button>
+        </form>
+        <br>
+
+        <!-- Изменение ответа -->
+        <form method="post">
+            <input type="hidden" name="action" value="update_answer">
+            <label><strong>Ответ модератора:</strong><br>
+                <textarea name="answer" rows="4" cols="50">{{ release.answer or '' }}</textarea>
+            </label><br>
+            <button type="submit">Сохранить ответ</button>
+        </form>
+        <br>
+
+        <!-- Изменение статуса -->
+        <form method="post">
+            <input type="hidden" name="action" value="update_status">
+            <label><strong>Статус:</strong>
+                <select name="status">
+                    <option value="0" {% if release.status == 0 %}selected{% endif %}>Отклонен</option>
+                    <option value="1" {% if release.status == 1 %}selected{% endif %}>На рассмотрении</option>
+                    <option value="2" {% if release.status == 2 %}selected{% endif %}>Одобрен</option>
+                    <option value="3" {% if release.status == 3 %}selected{% endif %}>Опубликован</option>
+                </select>
+            </label>
+            <button type="submit">Сохранить статус</button>
+        </form>
+        <br>
+        
+    </div>
+</div>
+
+<h2>Треки</h2>
+<div class="track-list">
+    {% for track in release.tracks %}
+        <div class="track">
+            <a href="{{ url_for('moder.track_detail', track_id=track.id) }}">
+                {{ track.title }}{% if track.version %} ({{ track.version }}){% endif %}
+            </a>
+        </div>
+    {% else %}
+        <p>Нет треков в этом релизе.</p>
+    {% endfor %}
+</div>
+
+<a href="{{ url_for('moder.all_releases') }}">⬅ Назад к списку релизов</a>
+</body>
+</html>

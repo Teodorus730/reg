@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Release Detail</title>
+</head>
+<body>
+    <h1>{{ release.title }}{% if release.version %} ({{ release.version }}){% endif %}</h1>
+    <p><strong>Release ID:</strong> {{ release.id }}</p>
+    <p><strong>Artists:</strong> {{ release.main_artists }}</p>
+    <p><strong>Featuring:</strong> {{ release.featured_artists }}</p>
+    <p><strong>Copyright:</strong> {{ release.copyright }}</p>
+    <p><strong>Genre:</strong> {{ release.genre }}</p>
+    <p><strong>Type:</strong> {{ release.release_type }}</p>
+    <p><strong>Release Date:</strong> {{ release.release_date }}</p>
+    <p><strong>UPC:</strong> {{ release.upc }}</p>
+    <p><strong>Status:</strong> 
+        {% if release.status == 0 %}
+            Отклонен
+        {% elif release.status == 1 %}
+            На рассмотрении
+        {% elif release.status == 2 %}
+            Одобрен
+        {% elif release.status == 3 %}
+            Опубликован
+        {% else %}
+            Неизвестно
+        {% endif %}
+    </p>
+
+    {% if release.cover_path %}
+        <p><img src="{{ url_for('static', filename=release.cover_path) }}" alt="Обложка" width="200"></p>
+    {% endif %}
+
+    {% if current_user.is_admin or current_user.is_moder %}
+    <form method="post">
+        <label for="status">Изменить статус:</label>
+        <select name="status" id="status">
+            <option value="0" {% if release.status == 0 %}selected{% endif %}>Отклонен</option>
+            <option value="1" {% if release.status == 1 %}selected{% endif %}>На рассмотрении</option>
+            <option value="2" {% if release.status == 2 %}selected{% endif %}>Одобрен</option>
+            <option value="3" {% if release.status == 3 %}selected{% endif %}>Опубликован</option>
+        </select>
+        <button type="submit">Сохранить</button>
+    </form>
+    {% endif %}
+
+    <h2>Треки</h2>
+    {% for track in release.tracks %}
+        <div style="border:1px solid #ccc; margin: 10px; padding: 10px;">
+            <h3>{{ track.title }}{% if track.version %} ({{ track.version }}){% endif %}</h3>
+            <p><strong>Основные артисты:</strong> {{ track.main_artists }}</p>
+            <p><strong>Фит:</strong> {{ track.featured_artists }}</p>
+            <p><strong>Автор:</strong> {{ track.author }}</p>
+            <p><strong>Композитор:</strong> {{ track.composer }}</p>
+            <p><strong>ISRC:</strong> {{ track.isrc }}</p>
+            <p><strong>TikTok старт:</strong> {{ track.tiktok_start }}</p>
+            <p><strong>Explicit:</strong> {{ "Да" if track.explicit else "Нет" }}</p>
+            {% if track.audio_path %}
+                <p><audio controls src="{{ url_for('static', filename=track.audio_path) }}"></audio></p>
+            {% endif %}
+            {% if track.pdf_path %}
+                <p><a href="{{ url_for('static', filename=track.pdf_path) }}" target="_blank">Скачать PDF</a></p>
+            {% endif %}
+        </div>
+    {% endfor %}
+</body>
+</html>

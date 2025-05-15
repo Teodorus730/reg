@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ track.title }} — Детали трека</title>
+</head>
+<body>
+<h1>{{ track.title }} — Информация о треке</h1>
+
+<ul>
+    <li><strong>Версия:</strong> {{ track.version or "-" }}</li>
+    <li><strong>Артисты:</strong> {{ track.main_artists or "-" }}</li>
+    <li><strong>Доп Артисты:</strong> {{ track.featured_artists or "-" }}</li>
+    <li><strong>Автор:</strong> {{ track.author or "-" }}</li>
+    <li><strong>Композитор:</strong> {{ track.composer or "-" }}</li>
+    <li><strong>Explicit:</strong> {{ "Да" if track.explicit else "Нет" }}</li>
+    <li><strong>TikTok старт:</strong> {{ track.tiktok_start or 0 }} сек.</li>
+    <li>
+        {% if track.audio_path %}
+            <a href="{{ url_for('client.uploaded_file', filename=track.audio_path) }}" target="_blank">🎧 Слушать</a>
+        {% else %}
+            Файл не загружен
+        {% endif %}
+    </li>
+    <li>
+        {% if track.pdf_path %}
+            <a href="{{ url_for('client.uploaded_file', filename=track.pdf_path) }}" target="_blank">📄 PDF</a>
+        {% else %}
+            PDF не загружен
+        {% endif %}
+    </li>
+</ul>
+
+<form method="post">
+    <label>ISRC:
+        <input type="text" name="isrc" value="{{ track.isrc or '' }}">
+    </label>
+    <button type="submit">Сохранить</button>
+</form>
+
+<a href="{{ url_for('moder.release_detail', release_id=track.release.id) }}">⬅ Назад к релизу</a>
+</body>
+</html>

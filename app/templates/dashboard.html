@@ -17,4 +17,8 @@
   <a href="{{ url_for('client.subs') }}">Мои саб аккаунты</a></br>
 {% endif %}
 
+{% if user.is_moder %}
+  <a href="{{ url_for('moder.all_releases') }}">Модерация релизов</a><br>
+{% endif %}
+
 <a href="{{ url_for('auth.logout') }}">Logout</a>

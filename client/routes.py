@@ -74,6 +74,7 @@ def create_release():
             upc=form.upc.data,
             cover_path=cover_rel_path,  
             user_id=current_user.id,
+            comment=form.comment.data,
             status=1
         )
         db.session.add(release)

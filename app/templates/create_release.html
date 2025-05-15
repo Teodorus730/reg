@@ -30,10 +30,15 @@
             <button type="button" class="btn cover" onclick="document.getElementById('cover-file').click()">Загрузить обложку</button>
         </div>
         
-        {% for field in form if field.name != 'tracks' and field.name != 'submit' and field.name != 'cover' %}
+        {% for field in form if field.name not in ['tracks', 'submit', 'cover', 'comment', 'csrf_token'] %}
             <p>{{ field.label }}: {{ field() }}
             {% if field.errors %}<span class="error">{{ field.errors[0] }}</span>{% endif %}</p>
         {% endfor %}
+        
+        <p>{{ form.comment.label }}:<br>
+        {{ form.comment(rows=4, cols=40) }}
+        {% if form.comment.errors %}<span class="error">{{ form.comment.errors[0] }}</span>{% endif %}</p>
+            
     </div>
 
     <div id="tracks-content" class="tab-content">

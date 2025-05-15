@@ -44,7 +44,7 @@ class Release(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(128), nullable=False)
     version = db.Column(db.String(64))
-    main_artists = db.Column(db.Text)  # можно сериализовать JSON
+    main_artists = db.Column(db.Text)
     featured_artists = db.Column(db.Text)
     copyright = db.Column(db.String(128))
     genre = db.Column(db.String(64))
@@ -53,6 +53,8 @@ class Release(db.Model):
     upc = db.Column(db.String(64))
     cover_path = db.Column(db.String(256))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    comment = db.Column(db.String(256))
+    answer = db.Column(db.String(256))
 
     tracks = db.relationship('Track', backref='release', lazy=True)
     

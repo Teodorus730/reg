@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Все релизы</title>
+</head>
+<body>
+    <h1>Список релизов</h1>
+
+    <form method="get">
+        <label>Фильтр по статусу:
+            <select name="status" onchange="this.form.submit()">
+                <option value="">Все</option>
+                <option value="0" {% if status_filter == '0' %}selected{% endif %}>Отклонен</option>
+                <option value="1" {% if status_filter == '1' %}selected{% endif %}>На рассмотрении</option>
+                <option value="2" {% if status_filter == '2' %}selected{% endif %}>Одобрен</option>
+                <option value="3" {% if status_filter == '3' %}selected{% endif %}>Опубликован</option>
+            </select>
+        </label>
+    </form>
+
+    <ul>
+        {% for release in releases %}
+            <li>
+                <strong>{{ release.user.username }}</strong> —
+                <strong>{{ release.title }}</strong> 
+                (Статус: 
+                {% if release.status == 0 %} Отклонен
+                {% elif release.status == 1 %} На рассмотрении
+                {% elif release.status == 2 %} Одобрен
+                {% elif release.status == 3 %} Опубликован
+                {% endif %}
+                ) —
+                <a href="{{ url_for('moder.release_detail', release_id=release.id) }}">Подробнее</a>
+            </li>
+        {% else %}
+            <li>Нет релизов.</li>
+        {% endfor %}
+    </ul>
+
+    <a href="{{ url_for('client.dashboard') }}">⬅ Назад</a>
+</body>
+</html>
