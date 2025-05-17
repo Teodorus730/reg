@@ -5,42 +5,6 @@ from admin.forms import CreateUserForm
 
 admin = Blueprint("admin", __name__)
 
-# @admin.route("/users", methods=["GET", "POST"])
-# @login_required
-# def users():
-#     if not current_user.is_admin:
-#         flash("Access denied")
-#         return redirect(url_for("client.dashboard"))
-
-#     if request.method == "POST":
-#         action = request.form.get("action")
-#         user_id = request.form.get("user_id")
-#         user = Users.query.get(user_id)
-#         if not user:
-#             flash("User not found")
-#             return redirect(url_for("admin.users"))
-
-#         if action == "delete":
-#             if user.id == current_user.id:
-#                 flash("You cannot delete yourself.")
-#                 return redirect(url_for("admin.users"))
-
-#             db.session.delete(user)
-#             db.session.commit()
-#             flash(f"User {user.username} deleted.")
-
-#         elif action == "update":
-#             new_role = request.form.get("user_type")
-#             if new_role not in ("admin", "moder", "artist", "sub"):
-#                 flash("Invalid role.")
-#             else:
-#                 user.user_type = new_role
-#                 db.session.commit()
-#                 flash(f"Role updated for {user.username}.")
-
-#     users = Users.query.all()
-#     return render_template("users.html", users=users)
-
 
 @admin.route('/all_users')
 @login_required
@@ -52,7 +16,7 @@ def all_users():
     type_filter = request.args.get("user_type")
     query = Users.query
 
-    if type_filter is not None and type_filter.isdigit():
+    if type_filter is not None and type_filter in ["admin", "sub", "moder", "artist"]:
         query = query.filter_by(user_type=type_filter)
 
     users = query.order_by(Users.id.desc()).all()
