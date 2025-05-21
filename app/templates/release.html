@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <title>Создание релиза</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/release.css') }}">
+    <script src="{{ url_for('static', filename='js/release.js') }}"></script>
+</head>
+<body>
+<h1>{{release.title}}</h1>
+    <div class="tabs">
+        <div id="release-tab" class="tab active" onclick="showTab('release')">Информация о релизе</div>
+        <div id="tracks-tab" class="tab" onclick="showTab('tracks')">Трек-лист</div>
+        {% if release.status == 2 or release.status == 3%}
+        <div id="promo-tab" class="tab" onclick="showTab('promo')">Промо</div>
+        <div id="video-tab" class="tab" onclick="showTab('video')">Видеошот</div>
+        {% endif %}
+        <div id="delete-tab" class="tab" onclick="showTab('delete')">Удалить</div>
+    </div>
+    
+    <div id="release-content" class="tab-content active">
+        <div class="cover-upload">
+            <label for="cover-file">
+                {% if release.cover_path %}
+                    <img src="{{ url_for('client.uploaded_file', filename=release.cover_path) }}" alt="Обложка" class="cover">
+                {% else %}
+                    <img src="{{ url_for('static', filename='img/placeholder.png') }}" alt="Без обложки" class="cover">
+                {% endif %}
+            </label>
+        </div>
+        
+        <p><strong>Версия:</strong> {{ release.version or "Не указана" }}</p>
+        <p><strong>Артисты:</strong> {{ release.main_artists or "-" }}</p>
+        <p><strong>Доп Артисты:</strong> {{ release.featured_artists or "-" }}</p>
+        <p><strong>Жанр:</strong> {{ release.genre or "Не указан" }}</p>
+        <p><strong>Тип:</strong> {{ release.release_type or "Не указан" }}</p>
+        <p><strong>Дата релиза:</strong> {{ release.release_date or "Не указана" }}</p>
+        <p><strong>Копирайт:</strong> {{ release.copyright or "-" }}</p>
+        <p><strong>UPC:</strong> {{ release.upc or "-" }}</p>
+        <p><strong>Статус:</strong>
+            {% if release.status == 0 %}
+                Отклонен
+            {% elif release.status == 1 %}
+                На рассмотрении
+            {% elif release.status == 2 %}
+                Одобрен
+            {% elif release.status == 3 %}
+                Опубликован
+            {% endif %}
+        </p>
+        <p><strong>Комментарий:</strong> {{ release.comment or "-"}}</p>
+        <p><strong>Ответ:</strong> {{ release.answer or "-"}}</p>
+    </div>
+
+    <div id="tracks-content" class="tab-content">
+        <div id="tracks">
+        {% for track_field in release.tracks %}
+            <div class="track-card" id="track-{{ loop.index0 }}">
+                <div class="track-header">
+                    <strong>{{track_field.title}}</strong>
+                    <div>
+                        <button type="button" class="btn small" id="toggle-button-{{ loop.index0 }}" onclick="toggleTrackBody({{ loop.index0 }})">Свернуть</button>
+                    </div>
+                </div>
+                <div class="track-body active" id="track-body-{{ loop.index0 }}">
+                    <p>Название: {{track_field.title}}</p>
+                    <p>Версия: {{track_field.version or "Не указана"}}</p>
+                    <p>Основные артисты: {{track_field.main_artists}}</p>
+                    <p>Дополнительные артисты: {{track_field.featured_artists or "Не указаны"}}</p>
+                    <p>Автор: {{track_field.author or "Не указан"}}</p>
+                    <p>Композитор: {{track_field.composer}}</p>
+                    <p>TikTok старт (сек): {{track_field.tiktok_start}}</p>
+                    <p>ISRC: {{track_field.isrc  or "Не указан"}}</p>
+                    <p>Explicit: {{track_field.explicit}}</p>
+                    <p>Аудио (WAV): 
+                    {% if track_field.audio_path %}
+                        <a href="{{ url_for('client.uploaded_file', filename=track_field.audio_path) }}" target="_blank">Слушать</a>
+                    {% else %}
+                        не загружен
+                    {% endif %}</p>
+                    <p>PDF: 
+                    {% if track_field.pdf_path %}
+                        <a href="{{ url_for('client.uploaded_file', filename=track_field.pdf_path) }}" target="_blank">PDF</a>
+                    {% else %}
+                        не загружен
+                    {% endif %}</p>
+                </div>
+            </div>
+            <script>trackCount++;</script>
+        {% else %}
+            Нет треков в этом релизе
+        {% endfor %}
+        </div>
+    </div>
+
+    {% if release.status == 2 or release.status == 3%}
+        <div id="promo-content" class="tab-content">
+            <h1>Добавить промо</h1>
+            <form method="POST" enctype="multipart/form-data">
+                {{ promo_form.hidden_tag() }}
+
+                {% for field in promo_form if field.name not in ['csrf_token', 'submit'] %}
+                    <p>{{ field.label }}<br>{{ field() }}
+                {% endfor %}
+
+                <br>
+                {{ promo_form.submit(class_="btn") }}
+            </form>
+        </div>
+
+        <div id="video-content" class="tab-content">
+            <h1>Добавить видеошот</h1>
+            <form method="POST" enctype="multipart/form-data">
+                {{ video_form.hidden_tag() }}
+
+                {% for field in video_form  if field.name not in ['csrf_token', 'submit'] %}
+                    <p>{{ field.label }}<br>{{ field() }}
+                {% endfor %}
+                <p>
+                    Требования к видео:<br>
+                    - Формат: MP4, H.264<br>
+                    - Размер: 720p (404x720), вертикальный<br>
+                    - Длительность: до 15 секунд<br>
+                </p>
+
+                <br>
+                {{ video_form.submit(class_="btn") }}
+            </form>
+        </div>
+    {% endif %}
+
+    <div id="delete-content" class="tab-content">
+        <h1>Удалить релиз?</h1>
+        <form action="{{ url_for('client.delete_release', release_id=release.id) }}" method="post">
+            <button type="submit" class="btn btn-danger">Удалить релиз</button>
+        </form>
+    </div>
+
+<a href="{{ url_for('client.releases') }}">⬅ Назад</a>
+
+</body>
+</html>

@@ -32,6 +32,12 @@
         <p><strong>Копирайт:</strong> {{ release.copyright or "-" }}</p>
         <p><strong>Пользователь:</strong> {{ release.user.username }}</p>
         <p><strong>Комментарий:</strong> {{ release.comment or "-"}}</p>
+        {% if release.status == 2 or release.status == 3 %}
+            <p><strong>Идея:</strong> {{ release.promo1 or "-"}}</p>
+            <p><strong>Маркетинг:</strong> {{ release.promo2 or "-"}}</p>
+            <p><strong>Посыл:</strong> {{ release.promo3 or "-"}}</p>
+            <p><strong>Видеошот:</strong> {{ release.video or "-"}}</p>
+        {% endif %}
 
 
         <!-- Изменение UPC -->

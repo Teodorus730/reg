@@ -3,15 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Мои релизы</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .release { border: 1px solid #ccc; border-radius: 10px; padding: 15px; margin-bottom: 20px; display: flex; gap: 15px; }
-        .cover { width: 150px; height: 150px; object-fit: cover; border-radius: 8px; border: 1px solid #aaa; }
-        .release-info { flex-grow: 1; }
-        .release h2 { margin: 0 0 10px; }
-        .track-list { margin-left: 20px; }
-        .track { margin-bottom: 5px; }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/releases.css') }}">
 </head>
 <body>
     <h1>Ваши релизы</h1>
@@ -19,13 +11,17 @@
     {% if releases %}
         {% for release in releases %}
             <div class="release">
+                {% if release.status == 0 or release.status == 1 %}
+                    <a href="{{ url_for('client.edit_release', release_id=release.id) }}" class="edit-button">Редактировать</a>
+                {% endif %}
+                
                 {% if release.cover_path %}
                     <img src="{{ url_for('client.uploaded_file', filename=release.cover_path) }}" alt="Обложка" class="cover">
                 {% else %}
                     <img src="{{ url_for('static', filename='img/placeholder.png') }}" alt="Без обложки" class="cover">
                 {% endif %}
                 <div class="release-info">
-                    <h2>{{ release.title }}</h2>
+                    <h2><a href="{{ url_for('client.release', release_id=release.id) }}">{{ release.title }}</a></h2>
                     <p><strong>Дата релиза:</strong> {{ release.release_date or "Не указана" }}</p>
                     <p><strong>Жанр:</strong> {{ release.genre or "Не указан" }}</p>
                     <p><strong>Тип:</strong> {{ release.release_type or "Не указан" }}</p>
@@ -41,8 +37,8 @@
                         {% endif %}
                     </p>
 
-                    <h3>Треки:</h3>
-                    <div class="track-list">
+                    <details class="track-list">
+                        <summary><h3>Трек-лист</h3></summary>
                         {% for track in release.tracks %}
                             <div class="track">
                                 🎵 <strong>{{ track.title }}</strong> {% if track.version %}({{ track.version }}){% endif %}
@@ -53,7 +49,7 @@
                         {% else %}
                             <p>Нет треков в этом релизе.</p>
                         {% endfor %}
-                    </div>
+                    </details>
                 </div>
             </div>
         {% endfor %}

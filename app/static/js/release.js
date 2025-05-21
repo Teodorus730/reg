@@ -4,13 +4,13 @@ function showTab(tabName) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
 
-    document.getElementById(`${tabName}-tab`).classList.add('active');
-    document.getElementById(`${tabName}-content`).classList.add('active');
+    document.getElementById(tabName+"-tab").classList.add('active');
+    document.getElementById(tabName+"-content").classList.add('active');
 }
 
 function toggleTrackBody(id) {
-    const body = document.getElementById(`track-body-${id}`);
-    const button = document.getElementById(`toggle-button-${id}`);
+    const body = document.getElementById("track-body-"+id);
+    const button = document.getElementById("toggle-button-"+id);
     if (body && button) {
         body.classList.toggle('active');
         const isActive = body.classList.contains('active');
@@ -19,13 +19,13 @@ function toggleTrackBody(id) {
 }
 
 function removeTrack(id) {
-    const el = document.getElementById(`track-${id}`);
+    const el = document.getElementById("track-"+id);
     if (el) el.remove();
 }
 
 function updateTrackTitle(index) {
-    const input = document.querySelector(`[name="tracks-${index}-title"]`);
-    const header = document.getElementById(`track-title-${index}`);
+    const input = document.querySelector('[name="tracks-'+index+'-title"]');
+    const header = document.getElementById('track-title-'+index);
     if (input && header) {
         const title = input.value.trim();
         header.textContent = title || "Новый трек";
@@ -38,11 +38,11 @@ function addTrack() {
     template = template.replace(/__prefix__/g, trackCount);
 
     const div = document.createElement("div");
-    div.id = `track-${trackCount}`;
+    div.id = "track-"+trackCount;
     div.innerHTML = template;
     container.appendChild(div);
 
-    const input = div.querySelector(`[name="tracks-${trackCount}-title"]`);
+    const input = div.querySelector('[name="tracks-'+trackCount+'-title"]');
     if (input) {
         input.addEventListener('input', () => updateTrackTitle(trackCount));
     }
@@ -50,9 +50,9 @@ function addTrack() {
     trackCount++;
 }
 
-window.addEventListener("DOMContentLoaded", () => {
-    addTrack();  // Добавить один трек по умолчанию
-});
+// window.addEventListener("DOMContentLoaded", () => {
+//     addTrack(); 
+// });
 
 
 function previewCover(event) {
@@ -66,3 +66,11 @@ function previewCover(event) {
         reader.readAsDataURL(file);
     }
 }
+
+document.querySelector('form').addEventListener('submit', function(e) {
+    const coverInput = document.getElementById('cover-file');
+    if (!coverInput.files.length) {
+        e.preventDefault();
+        alert("Пожалуйста, загрузите обложку.");
+    }
+});

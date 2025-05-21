@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <title>Редактирование релиза</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/release.css') }}">
+    <script src="{{ url_for('static', filename='js/release.js') }}"></script>
+</head>
+<body>
+<h1>Редактирование релиза</h1>
+
+<form method="POST" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+
+    {% for field in form.errors %}
+        <div class="error">{{ field }}: {{ form.errors[field][0] }}</div>
+    {% endfor %}
+
+    <div class="tabs">
+        <div id="release-tab" class="tab active" onclick="showTab('release')">Информация о релизе</div>
+        <div id="tracks-tab" class="tab" onclick="showTab('tracks')">Трек-лист</div>
+    </div>
+    
+    <div id="release-content" class="tab-content active">
+        <div class="cover-upload">
+            <label for="cover-file">
+                {% if release.cover_path %}
+                    <img id="cover-preview" src="{{ url_for('client.uploaded_file', filename=release.cover_path) }}" alt="Обложка">
+                {% else %}
+                    <img id="cover-preview" src="{{ url_for('static', filename='img/placeholder.png') }}" alt="Без обложки">
+                {% endif %}
+            </label>
+            {{ form.cover(style="display: none", id="cover-file", accept="image/*", onchange="previewCover(event)") }}
+            <button type="button" class="btn cover" onclick="document.getElementById('cover-file').click()">Загрузить обложку</button>
+        </div>
+        
+        {% for field in form if field.name not in ['tracks', 'submit', 'cover', 'comment', 'csrf_token'] %}
+            {% if field.name in ['main_artists', 'featured_artists'] %}
+                <p>{{ field.label }}: {{ field(placeholder='Введи через запятую') }}
+                {% if field.errors %}<span class="error">{{ field.errors[0] }}</span>{% endif %}</p>
+            {% else %}
+                <p>{{ field.label }}: {{ field() }}
+                {% if field.errors %}<span class="error">{{ field.errors[0] }}</span>{% endif %}</p>
+            {% endif %}
+        {% endfor %}
+        
+        <p>{{ form.comment.label }}:<br>
+        {{ form.comment(rows=4, cols=40) }}
+        {% if form.comment.errors %}<span class="error">{{ form.comment.errors[0] }}</span>{% endif %}</p>
+            
+    </div>
+
+    <div id="tracks-content" class="tab-content">
+        <div id="tracks">
+            {% if form.tracks %}
+                {% for track_field in form.tracks.data %}
+                    <div class="track-card" id="track-{{ loop.index0 }}">
+                        <div class="track-header">
+                            <strong id="track-title-{{ loop.index0 }}">{{track_field.title}}</strong>
+                            <div>
+                                <button type="button" class="btn small" id="toggle-button-{{ loop.index0 }}" onclick="toggleTrackBody({{ loop.index0 }})">Свернуть</button>
+                                <button type="button" class="btn small red" onclick="removeTrack({{ loop.index0 }})">×</button>
+                            </div>
+                        </div>
+                        <div class="track-body active" id="track-body-{{ loop.index0 }}">
+                            <p>Название: <input value="{{track_field.title}}" type="text" name="tracks-{{ loop.index0 }}-title" oninput="updateTrackTitle({{ loop.index0 }})"></p>
+                            <p>Версия: <input value="{{track_field.version}}" type="text" name="tracks-{{ loop.index0 }}-version"></p>
+                            <p>Основные артисты: <input value="{{track_field.main_artists}}" type="text" name="tracks-{{ loop.index0 }}-main_artists"></p>
+                            <p>Дополнительные артисты: <input value="{{track_field.featured_artists}}" type="text" name="tracks-{{ loop.index0 }}-featured_artists"></p>
+                            <p>Автор: <input value="{{track_field.author}}" type="text" name="tracks-{{ loop.index0 }}-author"></p>
+                            <p>Композитор: <input value="{{track_field.composer}}" type="text" name="tracks-{{ loop.index0 }}-composer"></p>
+                            <p>TikTok старт (сек): <input value="{% if track_field.tiktok_start != "None" %}{{track_field.tiktok_start}}{% endif %}" type="text" name="tracks-{{ loop.index0 }}-tiktok_start"></p>
+                            <p>ISRC: <input value="{{track_field.isrc}}" type="text" name="tracks-{{ loop.index0 }}-isrc"></p>
+                            <p>Explicit: 
+                                <select name="tracks-{{ loop.index0 }}-explicit">
+                                    <option value="False" {% if track_field.explicit == 'False' %}selected{% endif %}>Нет</option>
+                                    <option value="True" {% if track_field.explicit == 'True' %}selected{% endif %}>Да</option>
+                                </select>
+                            </p>
+                            <p>Аудио (WAV): <input type="file" name="tracks-{{ loop.index0 }}-audio_file" accept=".wav"></p>
+                            <p>PDF: <input type="file" name="tracks-{{ loop.index0 }}-pdf_file" accept=".pdf"></p>
+                        </div>
+                    </div>
+                    <script>trackCount++;</script>
+
+                {% endfor %}
+            {% else %}
+                {% for track_field in release.tracks %}
+                <div class="track-card" id="track-{{ loop.index0 }}">
+                    <div class="track-header">
+                        <strong id="track-title-{{ loop.index0 }}">{{track_field.title}}</strong>
+                        <div>
+                            <button type="button" class="btn small" id="toggle-button-{{ loop.index0 }}" onclick="toggleTrackBody({{ loop.index0 }})">Свернуть</button>
+                            <button type="button" class="btn small red" onclick="removeTrack({{ loop.index0 }})">×</button>
+                        </div>
+                    </div>
+                    <div class="track-body active" id="track-body-{{ loop.index0 }}">
+                        <p>Название: <input value="{{track_field.title}}" type="text" name="tracks-{{ loop.index0 }}-title" oninput="updateTrackTitle({{ loop.index0 }})"></p>
+                        <p>Версия: <input value="{{track_field.version}}" type="text" name="tracks-{{ loop.index0 }}-version"></p>
+                        <p>Основные артисты: <input value="{{track_field.main_artists}}" type="text" name="tracks-{{ loop.index0 }}-main_artists"></p>
+                        <p>Дополнительные артисты: <input value="{{track_field.featured_artists}}" type="text" name="tracks-{{ loop.index0 }}-featured_artists"></p>
+                        <p>Автор: <input value="{{track_field.author}}" type="text" name="tracks-{{ loop.index0 }}-author"></p>
+                        <p>Композитор: <input value="{{track_field.composer}}" type="text" name="tracks-{{ loop.index0 }}-composer"></p>
+                        <p>TikTok старт (сек): <input value="{{track_field.tiktok_start}}" type="text" name="tracks-{{ loop.index0 }}-tiktok_start"></p>
+                        <p>ISRC: <input value="{{track_field.isrc}}" type="text" name="tracks-{{ loop.index0 }}-isrc"></p>
+                        <p>Explicit: 
+                            <select name="tracks-{{ loop.index0 }}-explicit">
+                                <option value="False" {% if track_field.explicit == 'False' %}selected{% endif %}>Нет</option>
+                                <option value="True" {% if track_field.explicit == 'True' %}selected{% endif %}>Да</option>
+                            </select>
+                        </p>
+                        <p>Аудио (WAV): <input type="file" name="tracks-{{ loop.index0 }}-audio_file" accept=".wav"></p>
+                        <p>PDF: <input type="file" name="tracks-{{ loop.index0 }}-pdf_file" accept=".pdf"></p>
+                    </div>
+                </div>
+                <script>trackCount++;</script>
+
+                {% endfor %}
+            {% endif %}
+        </div>
+        <button type="button" class="btn" onclick="addTrack()">Добавить трек</button>
+    </div>
+
+    <br>
+    {{ form.submit(class_="btn") }}
+</form>
+<a href="{{ url_for('client.dashboard') }}">⬅ Назад</a>
+
+<template id="track-template">
+    <div class="track-card" id="track-__prefix__">
+        <div class="track-header">
+            <strong id="track-title-__prefix__">Новый трек</strong>
+            <div>
+                <button type="button" class="btn small" id="toggle-button-__prefix__" onclick="toggleTrackBody(__prefix__)">Свернуть</button>
+                <button type="button" class="btn small red" onclick="removeTrack(__prefix__)">×</button>
+            </div>
+        </div>
+        <div class="track-body active" id="track-body-__prefix__">
+            <p>Название: <input type="text" name="tracks-__prefix__-title" oninput="updateTrackTitle(__prefix__)"></p>
+            <p>Версия: <input type="text" name="tracks-__prefix__-version"></p>
+            <p>Основные артисты: <input type="text" name="tracks-__prefix__-main_artists"></p>
+            <p>Дополнительные артисты: <input type="text" name="tracks-__prefix__-featured_artists"></p>
+            <p>Автор: <input type="text" name="tracks-__prefix__-author"></p>
+            <p>Композитор: <input type="text" name="tracks-__prefix__-composer"></p>
+            <p>TikTok старт (сек): <input type="text" name="tracks-__prefix__-tiktok_start"></p>
+            <p>ISRC: <input type="text" name="tracks-__prefix__-isrc"></p>
+            <p>Explicit: 
+                <select name="tracks-__prefix__-explicit">
+                    <option value="False">Нет</option>
+                    <option value="True">Да</option>
+                </select>
+            </p>
+            <p>Аудио (WAV): <input type="file" name="tracks-__prefix__-audio_file" accept=".wav"></p>
+            <p>PDF: <input type="file" name="tracks-__prefix__-pdf_file" accept=".pdf"></p>
+        </div>
+    </div>
+</template>
+
+</body>
+</html>

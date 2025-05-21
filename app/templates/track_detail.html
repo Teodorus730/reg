@@ -14,7 +14,7 @@
     <li><strong>Автор:</strong> {{ track.author or "-" }}</li>
     <li><strong>Композитор:</strong> {{ track.composer or "-" }}</li>
     <li><strong>Explicit:</strong> {{ "Да" if track.explicit else "Нет" }}</li>
-    <li><strong>TikTok старт:</strong> {{ track.tiktok_start or 0 }} сек.</li>
+    <li><strong>TikTok старт:</strong> {{ track.tiktok_start or "-" }}</li>
     <li>
         {% if track.audio_path %}
             <a href="{{ url_for('client.uploaded_file', filename=track.audio_path) }}" target="_blank">🎧 Слушать</a>

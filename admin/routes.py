@@ -45,7 +45,7 @@ def create_user():
             db.session.add(new_user)
             db.session.commit()
             flash("User created")
-            return redirect(url_for("admin.users"))
+            return redirect(url_for("admin.all_users"))
     return render_template("create_user.html", form=form)
 
 
@@ -89,3 +89,36 @@ def user_detail(user_id):
                 flash("Недопустимый юзернейм", "error")
 
     return render_template("user_detail.html", user=user)
+
+
+@admin.route('/delete_user/<int:user_id>', methods=['POST'])
+@login_required
+def delete_user(user_id):
+    user = Users.query.get_or_404(user_id)
+
+    if not current_user.is_admin:
+        flash("Только администратор может удалять пользователей.")
+        return redirect(url_for('admin.all_users'))
+    
+    if user.is_admin:
+        flash("Нельзя удалять админов.")
+        return redirect(url_for('admin.all_users'))
+
+    for release in user.releases:
+        for track in release.tracks:
+            db.session.delete(track)
+        db.session.delete(release)
+
+    # Также можно удалить суб-аккаунты, если нужно
+    for sub in user.sub_accounts:
+        for release in sub.releases:
+            for track in release.tracks:
+                db.session.delete(track)
+            db.session.delete(release)
+        db.session.delete(sub)
+
+    db.session.delete(user)
+    db.session.commit()
+    flash("Пользователь и все связанные данные удалены.")
+    return redirect(url_for('admin.all_users'))
+

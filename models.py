@@ -55,6 +55,12 @@ class Release(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     comment = db.Column(db.String(256))
     answer = db.Column(db.String(256))
+    
+    promo1 = db.Column(db.String(256))
+    promo2 = db.Column(db.String(256))
+    promo3 = db.Column(db.String(256))
+    
+    video = db.Column(db.String(256))
 
     tracks = db.relationship('Track', backref='release', lazy=True)
     
@@ -68,7 +74,7 @@ class Track(db.Model):
     featured_artists = db.Column(db.Text)
     author = db.Column(db.String(128))
     composer = db.Column(db.String(128))
-    tiktok_start = db.Column(db.Integer)
+    tiktok_start = db.Column(db.String(128))
     isrc = db.Column(db.String(64))
     explicit = db.Column(db.Boolean, default=False)
     audio_path = db.Column(db.String(256))

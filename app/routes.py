@@ -1,4 +1,4 @@
-from flask import render_template
+from flask import redirect, url_for
 from flask_login import LoginManager, login_required, current_user
 from models import Users
 from auth.routes import auth
@@ -21,3 +21,8 @@ app.register_blueprint(moder, url_prefix="/moder")
 @login_manager.user_loader
 def load_user(user_id):
     return Users.query.get(int(user_id))
+
+
+@app.route("/")
+def releases():
+    return redirect(url_for("auth.login"))
