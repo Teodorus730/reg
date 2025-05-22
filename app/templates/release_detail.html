@@ -63,6 +63,7 @@
                         <label><strong>UPC:</strong>
                             <input type="text" name="upc" value="{{ release.upc or '' }}">
                         </label>
+                        <br><br>
                         <button class="btn" type="submit">Сохранить</button>
                     </form>
                     <br>
@@ -72,7 +73,8 @@
                         <input type="hidden" name="action" value="update_answer">
                         <label><strong>Ответ модератора:</strong><br>
                             <textarea name="answer" rows="4" cols="50">{{ release.answer or '' }}</textarea>
-                        </label><br>
+                        </label>
+                        <br><br>
                         <button class="btn" type="submit">Сохранить</button>
                     </form>
                     <br>
@@ -88,6 +90,7 @@
                                 <option value="3" {% if release.status == 3 %}selected{% endif %}>Опубликован</option>
                             </select>
                         </label>
+                        <br><br>
                         <button class="btn" type="submit">Сохранить</button>
                     </form>
                     <br>

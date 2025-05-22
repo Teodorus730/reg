@@ -35,7 +35,7 @@ class ReleaseForm(FlaskForm):
     comment = TextAreaField("Комментарий для модерации", validators=[Optional(), Length(min=3, max=250)])
 
     tracks = FieldList(FormField(TrackForm), min_entries=0)
-    submit = SubmitField("Сохранить")
+    submit = SubmitField("Отправить")
     
     
 class CreateSubForm(FlaskForm):
