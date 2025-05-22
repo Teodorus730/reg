@@ -2,73 +2,112 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Изменить юзера</title>
+    <title>Редактирование пользователя</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/release.css') }}">
 </head>
 <body>
-    <h1>Изменить юзера {{ user.username }}</h1>
-    {% if user.is_artist %}
-    <h2>УДАЛИТЬ ПОЛЬЗОВАТЕЛЯ И ВСЕ САБ АККАУНТЫ: 
-        <form action="{{ url_for('admin.delete_user', user_id=user.id) }}" method="post">
-            <button type="submit" class="btn btn-danger" onclick="return confirm('Удалить {{ user.username }}?')">Удалить</button>
-        </form></h2>
-    {% else %}
-    <h2>УДАЛИТЬ ПОЛЬЗОВАТЕЛЯ: 
-        <form action="{{ url_for('admin.delete_user', user_id=user.id) }}" method="post">
-            <button type="submit" class="btn btn-danger" onclick="return confirm('Удалить {{ user.username }}?')">Удалить</button>
-        </form></h2></h2>
-    {% endif %}
-
-    <!-- Изменение ника -->
-    <form method="post">
-        <input type="hidden" name="action" value="update_username">
-        <label><strong>Изменить юзернейм:</strong>
-            <input type="text" name="username" value="{{ user.username or '' }}">
-        </label>
-        <button type="submit">Сохранить</button>
-    </form>
-    <br>
-
-    <!-- Изменение пароля -->
-    <form method="post">
-        <input type="hidden" name="action" value="update_password">
-        <label><strong>Изменить пароль:</strong><br>
-            <input type="text" name="password">
-        </label><br>
-        <button type="submit">Сохранить</button>
-    </form>
-    <br>
-
-    <!-- Изменение типа -->
-    <form method="post">
-        <input type="hidden" name="action" value="update_type">
-        <label><strong>Статус:</strong>
-            <select name="user_type">
-                <option value="admin" {% if user.user_type == 'admin' %}selected{% endif %}>admin</option>
-                <option value="moder" {% if user.user_type == 'moder' %}selected{% endif %}>moder</option>
-                <option value="artist" {% if user.user_type == 'artist' %}selected{% endif %}>artist</option>
-                <option value="sub" {% if user.user_type == 'sub' %}selected{% endif %}>sub</option>
-            </select>
-        </label>
-        <button type="submit">Сохранить</button>
-    </form>
-    <br>
+    {% include 'flash_messages.html' %}
     
-    {% if user.user_type == "artist" %}
-        <h1>Сабаккаунты</h1>
+    <nav class="main-nav">
+       <div class="nav-container">
+            <!-- Логотип слева -->
+            <a href="{{ url_for('client.releases') }}" class="logo-link">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" 
+                    alt="Логотип" 
+                    class="nav-logo">
+            </a>
 
-        <ul>
-            {% for sub in user.sub_accounts %}
-                <li>
-                    <strong>{{ sub.username }}</strong> —
-                    <a href="{{ url_for('admin.user_detail', user_id=sub.id) }}">Изменить</a>
-                </li>
-            {% else %}
-                <li>Нет сабаккаунтов.</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+            <div class="nav-center">
+                <a href="{{ url_for('admin.all_users') }}" class="nav-btn active">Список пользователей</a>
+                <a href="{{ url_for('admin.create_user') }}" class="nav-btn">Создать пользователя</a>
+            </div>
 
+            <!-- Кнопка выхода справа -->
+            <div class="nav-right">
+                <a href="{{ url_for('auth.logout') }}" class="nav-btn logout">Выйти</a>
+            </div>
+        </div>
+    </nav>
 
-<a href="{{ url_for('admin.all_users') }}">⬅ Назад к списку юзеров</a>
+    <div class="container">
+        <h1 class="page-title">Редактирование {{ user.username }}</h1>
+
+        <div class="user-detail">
+            <div class="danger-zone">
+                <h3>Удаление пользователя</h3>
+                {% if user.is_artist %}
+                <p>Удалить пользователя, его релизы и сабаккаунты: </p>
+                    <form action="{{ url_for('admin.delete_user', user_id=user.id) }}" method="post">
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Удалить {{ user.username }}?')">Удалить</button>
+                    </form>
+                {% else %}
+                <p>Удалить пользователя и его релизы: </p>
+                    <form action="{{ url_for('admin.delete_user', user_id=user.id) }}" method="post">
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Удалить {{ user.username }}?')">Удалить</button>
+                    </form>
+                {% endif %}
+            </div>
+
+            <div class="forms-section">
+                    <!-- Изменение ника -->
+                    <form method="post">
+                        <input type="hidden" name="action" value="update_username">
+                        <label><strong>Изменить юзернейм:</strong>
+                            <input type="text" name="username" value="{{ user.username or '' }}">
+                        </label><br><br>
+                        <button class="btn primary" type="submit">Сохранить</button>
+                    </form>
+                    <br>
+
+                    <!-- Изменение пароля -->
+                    <form method="post">
+                        <input type="hidden" name="action" value="update_password">
+                        <label><strong>Изменить пароль:</strong><br>
+                            <input type="text" name="password">
+                        </label><br><br>
+                        <button class="btn primary" type="submit">Сохранить</button>
+                    </form>
+                    <br>
+
+                    <!-- Изменение типа -->
+                    <form method="post">
+                        <input type="hidden" name="action" value="update_type">
+                        <label><strong>Статус:</strong>
+                            <select name="user_type">
+                                <option value="admin" {% if user.user_type == 'admin' %}selected{% endif %}>admin</option>
+                                <option value="moder" {% if user.user_type == 'moder' %}selected{% endif %}>moder</option>
+                                <option value="artist" {% if user.user_type == 'artist' %}selected{% endif %}>artist</option>
+                                <option value="sub" {% if user.user_type == 'sub' %}selected{% endif %}>sub</option>
+                            </select>
+                        </label><br><br>
+                        <button class="btn primary" type="submit">Сохранить</button>
+                    </form>
+            </div>
+
+            {% if user.user_type == "artist" %}
+            <div class="sub-accounts">
+                <h3>Сабаккаунты</h3>
+                <div class="subs-grid">
+                    {% for sub in user.sub_accounts %}
+                    <div class="sub-card">
+                        <span class="sub-name">{{ sub.username }}</span>
+                        <a href="{{ url_for('admin.user_detail', user_id=sub.id) }}" 
+                           class="btn small">
+                            Изменить
+                        </a>
+                    </div>
+                    {% else %}
+                    <p class="empty-text">Нет сабаккаунтов</p>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="footer-links">
+            <br>
+            <a href="{{ url_for('admin.all_users') }}" class="btn secondary">⬅ Назад</a>
+        </div>
+    </div>
 </body>
 </html>

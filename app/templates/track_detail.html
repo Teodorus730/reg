@@ -2,42 +2,73 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>{{ track.title }} — Детали трека</title>
+    <title>Детали трека</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/release.css') }}">
 </head>
 <body>
-<h1>{{ track.title }} — Информация о треке</h1>
+    {% include 'flash_messages.html' %}
+    
+    <nav class="main-nav">
+        <div class="nav-container">
+            <!-- Логотип слева -->
+            <a href="{{ url_for('client.releases') }}" class="logo-link">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" 
+                    alt="Логотип" 
+                    class="nav-logo">
+            </a>
 
-<ul>
-    <li><strong>Версия:</strong> {{ track.version or "-" }}</li>
-    <li><strong>Артисты:</strong> {{ track.main_artists or "-" }}</li>
-    <li><strong>Доп Артисты:</strong> {{ track.featured_artists or "-" }}</li>
-    <li><strong>Автор:</strong> {{ track.author or "-" }}</li>
-    <li><strong>Композитор:</strong> {{ track.composer or "-" }}</li>
-    <li><strong>Explicit:</strong> {{ "Да" if track.explicit else "Нет" }}</li>
-    <li><strong>TikTok старт:</strong> {{ track.tiktok_start or "-" }}</li>
-    <li>
-        {% if track.audio_path %}
-            <a href="{{ url_for('client.uploaded_file', filename=track.audio_path) }}" target="_blank">🎧 Слушать</a>
-        {% else %}
-            Файл не загружен
-        {% endif %}
-    </li>
-    <li>
-        {% if track.pdf_path %}
-            <a href="{{ url_for('client.uploaded_file', filename=track.pdf_path) }}" target="_blank">📄 PDF</a>
-        {% else %}
-            PDF не загружен
-        {% endif %}
-    </li>
-</ul>
+            <!-- Кнопка выхода справа -->
+            <div class="nav-right">
+                <a href="{{ url_for('auth.logout') }}" class="nav-btn logout">Выйти</a>
+            </div>
+        </div>
+    </nav>
 
-<form method="post">
-    <label>ISRC:
-        <input type="text" name="isrc" value="{{ track.isrc or '' }}">
-    </label>
-    <button type="submit">Сохранить</button>
-</form>
+    <div class="container">
+        <h1 class="page-title">{{ track.title }}</h1>
 
-<a href="{{ url_for('moder.release_detail', release_id=track.release.id) }}">⬅ Назад к релизу</a>
+        <div class="track-detail">
+            <div class="track-info-card">
+                <div class="meta-grid">
+                    <strong>Версия: {{ track.version or "-" }}</strong>
+                    <strong>Артисты: {{ track.main_artists or "-" }}</strong>
+                    <strong>Доп Артисты: {{ track.featured_artists or "-" }}</strong>
+                    <strong>Автор: {{ track.author or "-" }}</strong>
+                    <strong>Композитор: {{ track.composer or "-" }}</strong>
+                    <strong>Explicit: {{ "Да" if track.explicit else "Нет" }}</strong>
+                    <strong>TikTok старт: {{ track.tiktok_start or 0 }}</strong>
+                </div>
+                <br>
+                <div class="file-links">
+                    {% if track.audio_path %}
+                        <a href="{{ url_for('client.uploaded_file', filename=track.audio_path) }}" target="_blank">🎧 Слушать</a>
+                    {% else %}
+                        Файл не загружен
+                    {% endif %}
+
+                    {% if track.pdf_path %}
+                        <a href="{{ url_for('client.uploaded_file', filename=track.pdf_path) }}" target="_blank">📄 PDF</a>
+                    {% else %}
+                        PDF не загружен
+                    {% endif %}
+                </div>
+            </div>
+
+            <form method="post" class="track-form">
+                <div class="form-field">
+                    <label class="form-label">ISRC</label>
+                    <input type="text" name="isrc" class="form-input" value="{{ track.isrc or '' }}">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn primary">Сохранить</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="footer-links">
+            <br>
+            <a href="{{ url_for('moder.release_detail', release_id=track.release.id) }}" class="btn secondary">⬅ Назад</a>
+        </div>
+    </div>
 </body>
 </html>

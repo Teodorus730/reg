@@ -1,9 +1,66 @@
-<h1>Создание пользователя</h1>
-<form method="post">
-  {{ form.hidden_tag() }}
-  {{ form.username.label }} {{ form.username() }}<br>
-  {{ form.password.label }} {{ form.password() }}<br>
-  {{ form.user_type.label }} {{ form.user_type() }}<br>
-  {{ form.submit() }}
-</form>
-<a href="{{ url_for('client.dashboard') }}">⬅ Назад</a>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Создание пользователя</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/release.css') }}">
+</head>
+<body>
+      {% include 'flash_messages.html' %}
+      
+      <nav class="main-nav">
+        <div class="nav-container">
+              <!-- Логотип слева -->
+              <a href="{{ url_for('client.releases') }}" class="logo-link">
+                  <img src="{{ url_for('static', filename='img/logo.png') }}" 
+                      alt="Логотип" 
+                      class="nav-logo">
+              </a>
+
+              <div class="nav-center">
+                  <a href="{{ url_for('admin.all_users') }}" class="nav-btn">Список пользователей</a>
+                  <a href="{{ url_for('admin.create_user') }}" class="nav-btn active">Создать пользователя</a>
+              </div>
+
+              <!-- Кнопка выхода справа -->
+              <div class="nav-right">
+                  <a href="{{ url_for('auth.logout') }}" class="nav-btn logout">Выйти</a>
+              </div>
+          </div>
+      </nav>
+
+    <div class="container">
+        <h1 class="page-title">Создание пользователя</h1>
+
+        <div class="auth-card">
+            <form method="post" class="user-form">
+                {{ form.hidden_tag() }}
+                
+                <div class="form-field">
+                    {{ form.username.label(class="form-label") }}
+                    {{ form.username(class="form-input", placeholder="Введите логин") }}
+                </div>
+                
+                <div class="form-field">
+                    {{ form.password.label(class="form-label") }}
+                    {{ form.password(class="form-input", placeholder="Введите пароль") }}
+                </div>
+
+                <div class="form-field">
+                    {{ form.user_type.label(class="form-label") }}
+                    {{ form.user_type(class="form-input") }}
+                </div>
+
+                <div class="form-actions">
+                    {{ form.submit(class="btn primary") }}
+                </div>
+            </form>
+        </div>
+
+        <div class="footer-links">
+            <br>
+            <a href="{{ url_for('client.dashboard') }}" class="btn secondary">⬅ Назад</a>
+        </div>
+    </div>
+</body>
+</html>

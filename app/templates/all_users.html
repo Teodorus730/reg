@@ -3,34 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <title>Все пользователи</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/release.css') }}">
 </head>
 <body>
-    <h1>Список пользователей</h1>
+    {% include 'flash_messages.html' %}
+    
+    <nav class="main-nav">
+       <div class="nav-container">
+            <!-- Логотип слева -->
+            <a href="{{ url_for('client.releases') }}" class="logo-link">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" 
+                    alt="Логотип" 
+                    class="nav-logo">
+            </a>
 
-    <form method="get">
-        <label>Фильтр по типу:
-            <select name="user_type" onchange="this.form.submit()">
-                <option value="">Все</option>
-                <option value="admin" {% if type_filter == 'admin' %}selected{% endif %}>admin</option>
-                <option value="moder" {% if type_filter == 'moder' %}selected{% endif %}>moder</option>
-                <option value="artist" {% if type_filter == 'artist' %}selected{% endif %}>artist</option>
-                <option value="sub" {% if type_filter == 'sub' %}selected{% endif %}>sub</option>
-            </select>
-        </label>
-    </form>
+            <div class="nav-center">
+                <a href="{{ url_for('admin.all_users') }}" class="nav-btn active">Список пользователей</a>
+                <a href="{{ url_for('admin.create_user') }}" class="nav-btn">Создать пользователя</a>
+            </div>
 
-    <ul>
-        {% for user in users %}
-            <li>
-                <strong>{{ user.username }}</strong> —
-                <strong>{{ user.user_type }}</strong> —
-                <a href="{{ url_for('admin.user_detail', user_id=user.id) }}">Изменить</a>
-            </li>
-        {% else %}
-            <li>Нет пользователей.</li>
-        {% endfor %}
-    </ul>
+            <!-- Кнопка выхода справа -->
+            <div class="nav-right">
+                <a href="{{ url_for('auth.logout') }}" class="nav-btn logout">Выйти</a>
+            </div>
+        </div>
+    </nav>
 
-    <a href="{{ url_for('client.dashboard') }}">⬅ Назад</a>
+    <div class="container">
+        <h1 class="page-title">Список пользователей</h1>
+
+        <div class="filter-section">
+            <form method="get" class="type-filter">
+                <label class="form-label">Фильтр по типу:
+                    <select name="user_type" class="form-input" onchange="this.form.submit()">
+                        <option value="">Все</option>
+                        <option value="admin" {% if type_filter == 'admin' %}selected{% endif %}>admin</option>
+                        <option value="moder" {% if type_filter == 'moder' %}selected{% endif %}>moder</option>
+                        <option value="artist" {% if type_filter == 'artist' %}selected{% endif %}>artist</option>
+                        <option value="sub" {% if type_filter == 'sub' %}selected{% endif %}>sub</option>
+                    </select>
+                </label>
+            </form>
+        </div>
+
+        <div class="users-grid">
+            {% for user in users %}
+            <div class="user-card">
+                <div class="user-header">
+                    <span class="user-type-badge type-{{ user.user_type }}">
+                        {{ user.user_type }}
+                    </span>
+                    <span class="user-name">{{ user.username }}</span>
+                </div>
+                
+                <div class="user-actions">
+                    <a href="{{ url_for('admin.user_detail', user_id=user.id) }}" class="btn small">
+                        Изменить
+                    </a>
+                </div>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <p class="empty-text">Нет пользователей</p>
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
 </body>
 </html>

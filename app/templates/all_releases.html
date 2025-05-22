@@ -3,41 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <title>Все релизы</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/release.css') }}">
 </head>
 <body>
-    <h1>Список релизов</h1>
+    {% include 'flash_messages.html' %}
+    
+    <nav class="main-nav">
+        <div class="nav-container">
+            <!-- Логотип слева -->
+            <a href="{{ url_for('client.releases') }}" class="logo-link">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" 
+                    alt="Логотип" 
+                    class="nav-logo">
+            </a>
 
-    <form method="get">
-        <label>Фильтр по статусу:
-            <select name="status" onchange="this.form.submit()">
-                <option value="">Все</option>
-                <option value="0" {% if status_filter == '0' %}selected{% endif %}>Отклонен</option>
-                <option value="1" {% if status_filter == '1' %}selected{% endif %}>На рассмотрении</option>
-                <option value="2" {% if status_filter == '2' %}selected{% endif %}>Одобрен</option>
-                <option value="3" {% if status_filter == '3' %}selected{% endif %}>Опубликован</option>
-            </select>
-        </label>
-    </form>
+            <!-- Кнопка выхода справа -->
+            <div class="nav-right">
+                <a href="{{ url_for('auth.logout') }}" class="nav-btn logout">Выйти</a>
+            </div>
+        </div>
+    </nav>
 
-    <ul>
-        {% for release in releases %}
-            <li>
-                <strong>{{ release.user.username }}</strong> —
-                <strong>{{ release.title }}</strong> 
-                (Статус: 
-                {% if release.status == 0 %} Отклонен
-                {% elif release.status == 1 %} На рассмотрении
-                {% elif release.status == 2 %} Одобрен
-                {% elif release.status == 3 %} Опубликован
-                {% endif %}
-                ) —
-                <a href="{{ url_for('moder.release_detail', release_id=release.id) }}">Подробнее</a>
-            </li>
-        {% else %}
-            <li>Нет релизов.</li>
-        {% endfor %}
-    </ul>
+    <div class="container">
+        <h1 class="page-title">Список релизов</h1>
 
-    <a href="{{ url_for('client.dashboard') }}">⬅ Назад</a>
+        <div class="filter-section">
+            <form method="get" class="status-filter">
+                <label class="form-label">Фильтр по статусу:<br><br>
+                    <select name="status" class="form-input" onchange="this.form.submit()">
+                        <option value="">Все</option>
+                        <option value="0" {% if status_filter == '0' %}selected{% endif %}>Отклонен</option>
+                        <option value="1" {% if status_filter == '1' %}selected{% endif %}>На рассмотрении</option>
+                        <option value="2" {% if status_filter == '2' %}selected{% endif %}>Одобрен</option>
+                        <option value="3" {% if status_filter == '3' %}selected{% endif %}>Опубликован</option>
+                    </select>
+                </label>
+            </form>
+        </div>
+
+        <div class="releases-grid">
+            {% for release in releases %}
+            <div class="release-card">
+                <div class="release-header">
+                    <span class="status-badge status-{{ release.status }}">
+                        {% if release.status == 0 %}
+                            Отклонен
+                        {% elif release.status == 1 %}
+                            На рассмотрении
+                        {% elif release.status == 2 %}
+                            Одобрен
+                        {% elif release.status == 3 %}
+                            Опубликован
+                        {% endif %}
+                    </span>
+                    <span class="user-badge">{{ release.user.username }}</span>
+                </div>
+                
+                <div class="release-content">
+                    <h3 class="release-title">
+                        <a href="{{ url_for('moder.release_detail', release_id=release.id) }}">
+                            {{ release.title }}
+                        </a>
+                    </h3>
+                    
+                    <div class="release-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Дата релиза:</span>
+                            <span class="meta-value">{{ release.release_date|default('—', true) }}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Тип:</span>
+                            <span class="meta-value">{{ release.release_type|default('—', true) }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <p class="empty-text">Нет релизов</p>
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
 </body>
 </html>

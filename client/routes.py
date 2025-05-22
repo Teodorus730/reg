@@ -18,8 +18,10 @@ MAX_SUB = 3
 def dashboard():
     if (current_user.is_artist or current_user.is_sub):
         return redirect(url_for("client.releases"))
-    else:
-        return render_template("dashboard.html", user=current_user)
+    elif (current_user.is_moder):
+        return redirect(url_for("moder.all_releases"))
+    elif (current_user.is_admin):
+        return redirect(url_for("admin.all_users"))
 
 
 @client.route('/uploads/<path:filename>')
