@@ -1,61 +1,147 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <title>Мои релизы</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/releases.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/release.css') }}">
 </head>
 <body>
-    <h1>Ваши релизы</h1>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-container">
+      {% for category, message in messages %}
+        <div class="flash-message flash-{{ category }}">
+          {{ message }}
+          <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+    <nav class="main-nav">
+        <div class="nav-container">
+            <!-- Логотип слева -->
+            <a href="{{ url_for('client.releases') }}" class="logo-link">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" 
+                    alt="Логотип" 
+                    class="nav-logo">
+            </a>
 
-    {% if releases %}
-        {% for release in releases %}
-            <div class="release">
-                {% if release.status == 0 or release.status == 1 %}
-                    <a href="{{ url_for('client.edit_release', release_id=release.id) }}" class="edit-button">Редактировать</a>
-                {% endif %}
-                
-                {% if release.cover_path %}
-                    <img src="{{ url_for('client.uploaded_file', filename=release.cover_path) }}" alt="Обложка" class="cover">
-                {% else %}
-                    <img src="{{ url_for('static', filename='img/placeholder.png') }}" alt="Без обложки" class="cover">
-                {% endif %}
-                <div class="release-info">
-                    <h2><a href="{{ url_for('client.release', release_id=release.id) }}">{{ release.title }}</a></h2>
-                    <p><strong>Дата релиза:</strong> {{ release.release_date or "Не указана" }}</p>
-                    <p><strong>Жанр:</strong> {{ release.genre or "Не указан" }}</p>
-                    <p><strong>Тип:</strong> {{ release.release_type or "Не указан" }}</p>
-                    <p><strong>Статус:</strong>
-                        {% if release.status == 0 %}
-                            Отклонен
-                        {% elif release.status == 1 %}
-                            На рассмотрении
-                        {% elif release.status == 2 %}
-                            Одобрен
-                        {% elif release.status == 3 %}
-                            Опубликован
-                        {% endif %}
-                    </p>
+            <!-- Центральное меню -->
+            <div class="nav-center">
+                <a href="{{ url_for('client.releases') }}" class="nav-btn active">Мои релизы</a>
+                <a href="{{ url_for('client.create_release') }}" class="nav-btn">Создать релиз</a>
+                <a href="{{ url_for('client.subs') }}" class="nav-btn">Саб аккаунты</a>
+            </div>
 
-                    <details class="track-list">
-                        <summary><h3>Трек-лист</h3></summary>
-                        {% for track in release.tracks %}
-                            <div class="track">
-                                🎵 <strong>{{ track.title }}</strong> {% if track.version %}({{ track.version }}){% endif %}
-                                {% if track.audio_path %}
-                                    <a href="{{ url_for('client.uploaded_file', filename=track.audio_path) }}" target="_blank">Слушать</a>
+            <!-- Кнопка выхода справа -->
+            <div class="nav-right">
+                <a href="{{ url_for('auth.logout') }}" class="nav-btn logout">Выйти</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container releases-container">
+        <h1 class="page-title">Ваши релизы</h1>
+
+        {% if releases %}
+            <div class="releases-grid">
+                {% for release in releases %}
+                    <div class="release-card">
+                        <div class="release-header">
+                            <span class="status-badge status-{{ release.status }}">
+                                {% if release.status == 0 %}
+                                    Отклонен
+                                {% elif release.status == 1 %}
+                                    На рассмотрении
+                                {% elif release.status == 2 %}
+                                    Одобрен
+                                {% elif release.status == 3 %}
+                                    Опубликован
+                                {% endif %}
+                            </span>
+                            {% if release.status == 0 or release.status == 1 %}
+                                <a href="{{ url_for('client.edit_release', release_id=release.id) }}" class="edit-btn">✎</a>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="release-content">
+                            <div class="cover-container">
+                                {% if release.cover_path %}
+                                    <img src="{{ url_for('client.uploaded_file', filename=release.cover_path) }}" 
+                                         alt="Обложка" 
+                                         class="release-cover">
+                                {% else %}
+                                    <img src="{{ url_for('static', filename='img/placeholder.png') }}" 
+                                         alt="Без обложки" 
+                                         class="release-cover">
                                 {% endif %}
                             </div>
-                        {% else %}
-                            <p>Нет треков в этом релизе.</p>
-                        {% endfor %}
-                    </details>
-                </div>
+                            
+                            <div class="release-info">
+                                <h2 class="release-title">
+                                    <a href="{{ url_for('client.release', release_id=release.id) }}">{{ release.title }}</a>
+                                </h2>
+                                
+                                <div class="release-meta">
+                                    <div class="meta-item">
+                                        <span class="meta-label">Дата релиза:</span>
+                                        <span class="meta-value">{{ release.release_date or "—" }}</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <span class="meta-label">Жанр:</span>
+                                        <span class="meta-value">{{ release.genre or "—" }}</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <span class="meta-label">Тип:</span>
+                                        <span class="meta-value">{{ release.release_type or "—" }}</span>
+                                    </div>
+                                </div>
+                                
+                                <details class="tracklist">
+                                    <summary class="tracklist-summary">
+                                        <span>Трек-лист ({{ release.tracks|length }})</span>
+                                        <div class="chevron"></div>
+                                    </summary>
+                                    <div class="tracklist-content">
+                                        {% for track in release.tracks %}
+                                            <div class="track-item">
+                                                <div class="track-info">
+                                                    <span class="track-icon">🎵</span>
+                                                    <span class="track-title">{{ track.title }}</span>
+                                                    <span class="track-title">({{ track.main_artists }})</span>
+                                                    {% if track.version %}
+                                                        <span class="track-version">({{ track.version }})</span>
+                                                    {% endif %}
+                                                </div>
+                                                {% if track.audio_path %}
+                                                    <a href="{{ url_for('client.uploaded_file', filename=track.audio_path) }}" 
+                                                       target="_blank" 
+                                                       class="track-link">
+                                                        Слушать
+                                                    </a>
+                                                {% endif %}
+                                            </div>
+                                        {% else %}
+                                            <div class="empty-tracklist">Нет треков в этом релизе</div>
+                                        {% endfor %}
+                                    </div>
+                                </details>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
-        {% endfor %}
-    {% else %}
-        <p>У вас пока нет релизов.</p>
-    {% endif %}
-    <a href="{{ url_for('client.dashboard') }}">⬅ Назад</a>
+        {% else %}
+            <div class="empty-state">
+                <img src="{{ url_for('static', filename='img/placeholder_noreleases.png') }}" 
+                     alt="Нет релизов" 
+                     class="empty-icon">
+                <p class="empty-text">У вас пока нет релизов</p>
+                <a href="{{ url_for('client.create_release') }}" class="btn">Создать первый релиз</a>
+            </div>
+        {% endif %}
+        
+    </div>
 </body>
 </html>

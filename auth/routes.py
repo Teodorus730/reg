@@ -15,7 +15,6 @@ def login():
         if user and user.check_password(form.password.data):
             login_user(user)
             return redirect(url_for("client.dashboard"))
-        flash("Invalid credentials")
     return render_template("login.html", form=form)
 
 

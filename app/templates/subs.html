@@ -2,26 +2,70 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Мои саб аккаунты</title>
+    <title>Саб аккаунты</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/release.css') }}">
 </head>
 <body>
-    <h1>Саб аккаунты</h1>
-    <table>
-        <tr><th>Имя</th><th>Действия</th></tr>
-        {% for user in users %}
-        <tr>
-            <td>{{ user.username }}</td>
-            <td>
-                <form method="post">
-                    <input type="hidden" name="action" value="delete">
-                    <input type="hidden" name="user_id" value="{{ user.id }}">
-                    <button type="submit" onclick="return confirm('Удалить {{ user.username }}?')">Удалить</button>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-    <a href="{{ url_for('client.create_sub') }}">Создать новый саб аккаунт</a><br>
-    <a href="{{ url_for('client.dashboard') }}">⬅ Назад</a>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-container">
+      {% for category, message in messages %}
+        <div class="flash-message flash-{{ category }}">
+          {{ message }}
+          <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+<nav class="main-nav">
+        <div class="nav-container">
+            <!-- Логотип слева -->
+            <a href="{{ url_for('client.releases') }}" class="logo-link">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" 
+                    alt="Логотип" 
+                    class="nav-logo">
+            </a>
+
+            <!-- Центральное меню -->
+            <div class="nav-center">
+                <a href="{{ url_for('client.releases') }}" class="nav-btn">Мои релизы</a>
+                <a href="{{ url_for('client.create_release') }}" class="nav-btn">Создать релиз</a>
+                <a href="{{ url_for('client.subs') }}" class="nav-btn active">Саб аккаунты</a>
+            </div>
+
+            <!-- Кнопка выхода справа -->
+            <div class="nav-right">
+                <a href="{{ url_for('auth.logout') }}" class="nav-btn logout">Выйти</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header-section">
+            <h1 class="page-title">Саб аккаунты</h1>
+            <a href="{{ url_for('client.create_sub') }}" class="btn">Создать новый</a>
+        </div>
+
+        {% if users %}
+        <div class="accounts-list">
+            {% for user in users %}
+            <div class="account-card">
+                <div class="account-info">
+                    <span class="account-name">{{ user.username }}</span>
+                    <form action="{{ url_for('client.delete_sub', user_id=user.id) }}" method="post">
+                        <button type="submit" class="btn small red" onclick="return confirm('Удалить {{ user.username }}?')">Удалить</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <p class="empty-text">Нет созданных саб-аккаунтов</p>
+        </div>
+        {% endif %}
+
+    </div>
 </body>
 </html>

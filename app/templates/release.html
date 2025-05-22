@@ -7,13 +7,52 @@
     <script src="{{ url_for('static', filename='js/release.js') }}"></script>
 </head>
 <body>
-<h1>{{release.title}}</h1>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-container">
+      {% for category, message in messages %}
+        <div class="flash-message flash-{{ category }}">
+          {{ message }}
+          <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<nav class="main-nav">
+        <div class="nav-container">
+            <!-- Логотип слева -->
+            <a href="{{ url_for('client.releases') }}" class="logo-link">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" 
+                    alt="Логотип" 
+                    class="nav-logo">
+            </a>
+
+            <!-- Центральное меню -->
+            <div class="nav-center">
+                <a href="{{ url_for('client.releases') }}" class="nav-btn active">Мои релизы</a>
+                <a href="{{ url_for('client.create_release') }}" class="nav-btn">Создать релиз</a>
+                <a href="{{ url_for('client.subs') }}" class="nav-btn">Саб аккаунты</a>
+            </div>
+
+            <!-- Кнопка выхода справа -->
+            <div class="nav-right">
+                <a href="{{ url_for('auth.logout') }}" class="nav-btn logout">Выйти</a>
+            </div>
+        </div>
+    </nav>
+<h1 class="page-title">{{release.title}}</h1>
+<div class="container">
+
     <div class="tabs">
         <div id="release-tab" class="tab active" onclick="showTab('release')">Информация о релизе</div>
         <div id="tracks-tab" class="tab" onclick="showTab('tracks')">Трек-лист</div>
         {% if release.status == 2 or release.status == 3%}
         <div id="promo-tab" class="tab" onclick="showTab('promo')">Промо</div>
         <div id="video-tab" class="tab" onclick="showTab('video')">Видеошот</div>
+        <div id="edit-tab" class="tab" onclick="showTab('edit')">Изменить</div>
+        <div id="prodby-tab" class="tab" onclick="showTab('prodby')">Prod by</div>
         {% endif %}
         <div id="delete-tab" class="tab" onclick="showTab('delete')">Удалить</div>
     </div>
@@ -127,16 +166,42 @@
                 {{ video_form.submit(class_="btn") }}
             </form>
         </div>
+
+        <div id="edit-content" class="tab-content">
+            <h1>Редактировать</h1>
+            <form method="POST" enctype="multipart/form-data">
+                {{ edit_form.hidden_tag() }}
+
+                {% for field in edit_form if field.name not in ['csrf_token', 'submit'] %}
+                    <p>{{ field.label }}<br>{{ field() }}
+                {% endfor %}
+
+                <br>
+                {{ edit_form.submit(class_="btn") }}
+            </form>
+        </div>
+
+        <div id="prodby-content" class="tab-content">
+            <h1>Prod by</h1>
+            <form method="POST" enctype="multipart/form-data">
+                {{ prodby_form.hidden_tag() }}
+
+                {% for field in prodby_form if field.name not in ['csrf_token', 'submit'] %}
+                    <p>{{ field.label }}<br>{{ field() }}
+                {% endfor %}
+
+                <br>
+                {{ prodby_form.submit(class_="btn") }}
+            </form>
+        </div>
     {% endif %}
 
     <div id="delete-content" class="tab-content">
         <h1>Удалить релиз?</h1>
         <form action="{{ url_for('client.delete_release', release_id=release.id) }}" method="post">
-            <button type="submit" class="btn btn-danger">Удалить релиз</button>
+            <button type="submit" class="btn red"  onclick="return confirm('Удалить этот релиз?')">Удалить релиз</button>
         </form>
     </div>
-
-<a href="{{ url_for('client.releases') }}">⬅ Назад</a>
-
+</div>
 </body>
 </html>

@@ -3,6 +3,12 @@ from flask_login import login_user, logout_user, login_required, current_user
 from models import db, Users
 from admin.forms import CreateUserForm
 
+from utils import delete_file
+import os
+
+UPLOAD_FOLDER = "files"
+
+
 admin = Blueprint("admin", __name__)
 
 
@@ -97,22 +103,46 @@ def delete_user(user_id):
     user = Users.query.get_or_404(user_id)
 
     if not current_user.is_admin:
-        flash("Только администратор может удалять пользователей.")
-        return redirect(url_for('admin.all_users'))
+        flash("Недоступно")
+        return redirect(url_for('client.dashboard'))
     
     if user.is_admin:
         flash("Нельзя удалять админов.")
         return redirect(url_for('admin.all_users'))
 
     for release in user.releases:
+        
+        cover_full_path = os.path.join(UPLOAD_FOLDER, release.cover_path)
+        delete_file(cover_full_path)
+        
         for track in release.tracks:
+            if track.pdf_path:
+                pdf_full_path = os.path.join(UPLOAD_FOLDER, track.pdf_path)
+                delete_file(pdf_full_path)
+            
+            if track.audio_path:
+                audio_full_path = os.path.join(UPLOAD_FOLDER, track.audio_path)
+                delete_file(audio_full_path)
+        
             db.session.delete(track)
+            
         db.session.delete(release)
 
-    # Также можно удалить суб-аккаунты, если нужно
     for sub in user.sub_accounts:
         for release in sub.releases:
+            
+            cover_full_path = os.path.join(UPLOAD_FOLDER, release.cover_path)
+            delete_file(cover_full_path)
+            
             for track in release.tracks:
+                if track.pdf_path:
+                    pdf_full_path = os.path.join(UPLOAD_FOLDER, track.pdf_path)
+                    delete_file(pdf_full_path)
+                
+                if track.audio_path:
+                    audio_full_path = os.path.join(UPLOAD_FOLDER, track.audio_path)
+                    delete_file(audio_full_path)
+            
                 db.session.delete(track)
             db.session.delete(release)
         db.session.delete(sub)

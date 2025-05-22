@@ -1,8 +1,70 @@
-<h1>Создание саб аккаунта</h1>
-<form method="post">
-  {{ form.hidden_tag() }}
-  {{ form.username.label }} {{ form.username() }}<br>
-  {{ form.password.label }} {{ form.password() }}<br>
-  {{ form.submit() }}
-</form>
-<a href="{{ url_for('client.dashboard') }}">⬅ Назад</a>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Создание саб аккаунта</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/release.css') }}">
+</head>
+<body>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-container">
+      {% for category, message in messages %}
+        <div class="flash-message flash-{{ category }}">
+          {{ message }}
+          <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+    <nav class="main-nav">
+        <div class="nav-container">
+            <!-- Логотип слева -->
+            <a href="{{ url_for('client.releases') }}" class="logo-link">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" 
+                    alt="Логотип" 
+                    class="nav-logo">
+            </a>
+
+            <!-- Центральное меню -->
+            <div class="nav-center">
+                <a href="{{ url_for('client.releases') }}" class="nav-btn">Мои релизы</a>
+                <a href="{{ url_for('client.create_release') }}" class="nav-btn">Создать релиз</a>
+                <a href="{{ url_for('client.subs') }}" class="nav-btn active">Саб аккаунты</a>
+            </div>
+
+            <!-- Кнопка выхода справа -->
+            <div class="nav-right">
+                <a href="{{ url_for('auth.logout') }}" class="nav-btn logout">Выйти</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="form-wrapper">
+            <h1 class="page-title">Создание саб аккаунта</h1>
+            
+            <form method="post" class="auth-form">
+                {{ form.hidden_tag() }}
+                
+                <div class="form-field">
+                    {{ form.username.label(class="form-label") }}
+                    {{ form.username(class="form-input", placeholder="Введите логин") }}
+                </div>
+                
+                <div class="form-field">
+                    {{ form.password.label(class="form-label") }}
+                    {{ form.password(class="form-input", placeholder="Введите пароль") }}
+                </div>
+                
+                <div class="form-actions">
+                    {{ form.submit(class="btn") }}
+                    <a href="{{ url_for('client.subs') }}" class="btn secondary">Отмена</a>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</body>
+</html>

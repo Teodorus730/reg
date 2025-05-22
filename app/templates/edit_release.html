@@ -7,8 +7,45 @@
     <script src="{{ url_for('static', filename='js/release.js') }}"></script>
 </head>
 <body>
-<h1>Редактирование релиза</h1>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-container">
+      {% for category, message in messages %}
+        <div class="flash-message flash-{{ category }}">
+          {{ message }}
+          <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
 
+<nav class="main-nav">
+        <div class="nav-container">
+            <!-- Логотип слева -->
+            <a href="{{ url_for('client.releases') }}" class="logo-link">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" 
+                    alt="Логотип" 
+                    class="nav-logo">
+            </a>
+
+            <!-- Центральное меню -->
+            <div class="nav-center">
+                <a href="{{ url_for('client.releases') }}" class="nav-btn active">Мои релизы</a>
+                <a href="{{ url_for('client.create_release') }}" class="nav-btn">Создать релиз</a>
+                <a href="{{ url_for('client.subs') }}" class="nav-btn">Саб аккаунты</a>
+            </div>
+
+            <!-- Кнопка выхода справа -->
+            <div class="nav-right">
+                <a href="{{ url_for('auth.logout') }}" class="nav-btn logout">Выйти</a>
+            </div>
+        </div>
+    </nav>
+
+<h1 class="page-title">Редактирование релиза</h1>
+
+<div class="container">
 <form method="POST" enctype="multipart/form-data">
     {{ form.hidden_tag() }}
 
@@ -33,10 +70,22 @@
             {{ form.cover(style="display: none", id="cover-file", accept="image/*", onchange="previewCover(event)") }}
             <button type="button" class="btn cover" onclick="document.getElementById('cover-file').click()">Загрузить обложку</button>
         </div>
+
+        <span class="info">
+            Обложка: 
+            формат: JPEG, 
+            размер: 3000x3000 - 3500x3500 пикселей, 
+            квадратное изображение (ширина = высота), 
+            цветовой режим: RGB, 
+            максимальный размер файла: 10 МБ
+        </span><br>
         
         {% for field in form if field.name not in ['tracks', 'submit', 'cover', 'comment', 'csrf_token'] %}
-            {% if field.name in ['main_artists', 'featured_artists'] %}
-                <p>{{ field.label }}: {{ field(placeholder='Введи через запятую') }}
+            {% if field.name == 'main_artists'%}
+                <p>{{ field.label }}: {{ field(placeholder='Перечислите артистов через запятую') }}
+                {% if field.errors %}<span class="error">{{ field.errors[0] }}</span>{% endif %}</p>
+            {% elif field.name == 'featured_artists'%}
+                <p>{{ field.label }}: {{ field(placeholder='Перечислите дополнительных артистов через запятую') }}
                 {% if field.errors %}<span class="error">{{ field.errors[0] }}</span>{% endif %}</p>
             {% else %}
                 <p>{{ field.label }}: {{ field() }}
@@ -52,6 +101,15 @@
 
     <div id="tracks-content" class="tab-content">
         <div id="tracks">
+            <span class="info">
+                Трек:
+                формат: WAV, 
+                частота дискретизации: 44.1 кГц, 
+                битность: 16 бит, 
+                каналы: Стерео, 
+                максимальный размер файла: 500 МБ
+            </span><br><br>
+
             {% if form.tracks %}
                 {% for track_field in form.tracks.data %}
                     <div class="track-card" id="track-{{ loop.index0 }}">
@@ -124,7 +182,7 @@
     <br>
     {{ form.submit(class_="btn") }}
 </form>
-<a href="{{ url_for('client.dashboard') }}">⬅ Назад</a>
+</div>
 
 <template id="track-template">
     <div class="track-card" id="track-__prefix__">

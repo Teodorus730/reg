@@ -47,7 +47,7 @@ class Release(db.Model):
     main_artists = db.Column(db.Text)
     featured_artists = db.Column(db.Text)
     copyright = db.Column(db.String(128))
-    genre = db.Column(db.String(64))
+    genre = db.Column(db.String(128))
     release_type = db.Column(db.String(64))
     release_date = db.Column(db.Date)
     upc = db.Column(db.String(64))
@@ -61,6 +61,10 @@ class Release(db.Model):
     promo3 = db.Column(db.String(256))
     
     video = db.Column(db.String(256))
+    
+    edit = db.Column(db.String(256))
+    
+    prodby = db.Column(db.String(256))
 
     tracks = db.relationship('Track', backref='release', lazy=True)
     

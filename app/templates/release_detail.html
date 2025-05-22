@@ -32,12 +32,16 @@
         <p><strong>Копирайт:</strong> {{ release.copyright or "-" }}</p>
         <p><strong>Пользователь:</strong> {{ release.user.username }}</p>
         <p><strong>Комментарий:</strong> {{ release.comment or "-"}}</p>
-        {% if release.status == 2 or release.status == 3 %}
-            <p><strong>Идея:</strong> {{ release.promo1 or "-"}}</p>
-            <p><strong>Маркетинг:</strong> {{ release.promo2 or "-"}}</p>
-            <p><strong>Посыл:</strong> {{ release.promo3 or "-"}}</p>
-            <p><strong>Видеошот:</strong> {{ release.video or "-"}}</p>
-        {% endif %}
+        <h2>Промо:</h2>
+        <p><strong>- Идея:</strong> {{ release.promo1 or "-"}}</p>
+        <p><strong>- Маркетинг:</strong> {{ release.promo2 or "-"}}</p>
+        <p><strong>- Посыл:</strong> {{ release.promo3 or "-"}}</p>
+        <h2>Видеошот:</h2>
+        <p><strong>- Видеошот:</strong> {{ release.video or "-"}}</p>
+        <h2>Изменить:</h2>
+        <p><strong>- Изменения:</strong> {{ release.edit or "-"}}</p>
+        <h2>Prod by:</h2>
+        <p><strong>- Prod by:</strong> {{ release.prodby or "-"}}</p>
 
 
         <!-- Изменение UPC -->

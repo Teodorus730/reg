@@ -1,27 +1,424 @@
-/* Base styles */
+/* Объединенный CSS файл */
+
+/* Base styles из 1 файла */
 *, *::before, *::after {
     box-sizing: border-box;
 }
 
+:root {
+    --primary: #ff7eb9;
+    --secondary: #2a2a2a;
+    --background: #0a0a0a;
+    --text: #ffffff;
+}
+
 body {
     font-family: 'Segoe UI', system-ui, sans-serif;
-    margin: 2rem auto;
+    margin: 0 auto;
     padding: 0 20px;
-    max-width: 800px;
-    background: #0a0a0a;
-    color: #fff;
+    background: var(--background);
+    color: var(--text);
     line-height: 1.6;
+}
+
+.page-title {
+    text-align: center;
+    margin: 2rem 0;
+    color: var(--primary);
+}
+
+/* Navigation из 1 файла */
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 auto;
+    padding: 0 20px;
+    gap: 2rem;
+}
+
+.logo-link {
+    flex: 0 0 auto;
+}
+
+.nav-logo {
+    height: 40px;
+    width: auto;
+    transition: opacity 0.3s ease;
+}
+
+.nav-center {
+    flex: 1 1 auto;
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+.nav-right {
+    flex: 0 0 auto;
+    margin-left: auto;
+}
+
+.nav-btn {
+    padding: 12px 28px;
+    border-radius: 12px;
+    color: #ff7eb9;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    font-size: 0.95rem;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.nav-btn.active {
+    background: #ff7eb9;
+    color: #0a0a0a;
+    font-weight: 600;
+}
+
+.nav-btn:hover:not(.active) {
+    border-color: #ff7eb9;
+}
+
+/* Стили из 2 файла для страницы релизов */
+.releases-grid {
+    display: grid;
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.release-card {
+    background: var(--secondary);
+    border-radius: 18px;
+    padding: 1.5rem;
+    position: relative;
+    transition: transform 0.3s ease;
+}
+
+.release-card:hover {
+    transform: translateY(-3px);
+}
+
+.release-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.status-0 { background: #dc3545; }
+.status-1 { background: #ffc107; color: #000; }
+.status-2 { background: #17a2b8; }
+.status-3 { background: #28a745; }
+
+.edit-btn {
+    color: var(--primary);
+    text-decoration: none;
+    font-size: 1.2rem;
+    padding: 8px;
+    transition: opacity 0.3s ease;
+}
+
+.edit-btn:hover {
+    opacity: 0.8;
+}
+
+.release-content {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 2rem;
+}
+
+.release-cover {
+    width: 100%;
+    height: 250px;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 2px solid var(--secondary);
+}
+
+.release-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.release-title {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.release-title a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.release-meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.meta-item {
+    background: #1a1a1a;
+    padding: 12px;
+    border-radius: 8px;
+}
+
+.meta-label {
+    display: block;
+    color: var(--primary);
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+}
+
+.tracklist {
+    border: 2px solid var(--secondary);
+    border-radius: 12px;
+    margin-top: 1rem;
+}
+
+.tracklist-summary {
+    padding: 1rem;
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tracklist-summary::-webkit-details-marker {
+    display: none;
+}
+
+.chevron {
+    width: 12px;
+    height: 12px;
+    border-left: 2px solid var(--primary);
+    border-bottom: 2px solid var(--primary);
+    transform: rotate(-45deg);
+    transition: transform 0.3s ease;
+}
+
+.tracklist[open] .chevron {
+    transform: rotate(135deg);
+}
+
+.tracklist-content {
+    padding: 1rem;
+    border-top: 2px solid var(--secondary);
+}
+
+.track-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #333;
+}
+
+.track-item:last-child {
+    border-bottom: none;
+}
+
+.track-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.track-icon {
+    font-size: 1.2rem;
+}
+
+.track-title {
+    font-weight: 500;
+}
+
+.track-version {
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.track-link {
+    color: var(--primary);
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--primary);
+    transition: all 0.3s ease;
+}
+
+.track-link:hover {
+    background: var(--primary);
+    color: var(--background);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 0;
+}
+
+.empty-icon {
+    width: 200px;
+    height: auto;
+    margin-bottom: 2rem;
+    opacity: 0.6;
+}
+
+.empty-text {
+    color: #666;
+    margin-bottom: 2rem;
+}
+
+/* Остальные стили из 1 файла */
+/* ... (вставить все остальные стили из первого файла без изменений) ... */
+
+/* Медиа-запросы из 2 файла */
+@media (max-width: 768px) {
+    .release-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .release-card {
+        padding: 1rem;
+    }
+    
+    .track-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+}
+
+/* Общие медиа-запросы */
+@media (max-width: 1024px) {
+    .nav-container {
+        flex-wrap: wrap;
+        padding: 1rem 20px;
+        gap: 1rem;
+    }
+    
+    .nav-center {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .nav-right {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-center {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    .nav-btn {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+        height: 40px;
+    }
+    
+    .nav-logo {
+        height: 35px;
+    }
+}
+
+.info {
+    color: var(--primary);
+}
+
+/* Сохраняем оригинальные стили кнопок */
+.nav-btn {
+    padding: 12px 28px;
+    border-radius: 12px;
+    color: #ff7eb9;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    font-size: 0.95rem;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.nav-btn.active {
+    background: #ff7eb9;
+    color: #0a0a0a;
+    font-weight: 600;
+}
+
+.nav-btn:hover:not(.active) {
+    border-color: #ff7eb9;
+}
+
+/* Адаптивность */
+@media (max-width: 1024px) {
+    .nav-container {
+        flex-wrap: wrap;
+        padding: 1rem 20px;
+        gap: 1rem;
+    }
+    
+    .nav-center {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .nav-right {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-center {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    .nav-btn {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+        height: 40px;
+    }
+    
+    .nav-logo {
+        height: 35px;
+    }
 }
 
 /* Tabs system */
 .tabs {
     display: flex;
+    flex-wrap: wrap;
     gap: 8px;
     margin-bottom: 1.5rem;
+    max-width: 100%;
+    overflow-x: auto;
+    padding-bottom: 4px;
 }
 
 .tab {
-    padding: 12px 28px;
+    flex: 1 0 auto;
+    padding: 12px 20px;
     cursor: pointer;
     background: #1a1a1a;
     color: #ff7eb9;
@@ -29,6 +426,36 @@ body {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: 2px solid transparent;
     font-size: 0.95rem;
+    white-space: nowrap;
+    min-width: max-content;
+    text-align: center;
+}
+
+/* Для очень широких экранов */
+@media (min-width: 1600px) {
+    .tabs {
+        justify-content: center;
+    }
+    
+    .tab {
+        flex: 0 1 auto;
+        padding: 12px 28px;
+    }
+}
+
+/* Адаптация для средних экранов */
+@media (max-width: 1280px) {
+    .tab {
+        font-size: 0.9rem;
+        padding: 10px 18px;
+    }
+}
+
+/* Убрать горизонтальный скролл */
+@media (max-width: 1024px) {
+    .tabs {
+        overflow-x: visible;
+    }
 }
 
 .tab.active {
@@ -36,6 +463,16 @@ body {
     color: #0a0a0a;
     border-color: #ff7eb9;
     font-weight: 600;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.releases-container {
+    max-width: 1200px;
 }
 
 .tab:hover:not(.active) {
@@ -293,7 +730,6 @@ a {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    margin-top: 2rem;
     padding: 8px 16px;
     border-radius: 8px;
     transition: all 0.3s ease;
@@ -330,4 +766,219 @@ a:hover {
 @keyframes fade-in {
     from { opacity: 0; transform: translateY(-15px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+/* Account List */
+.header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.accounts-list {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.account-card {
+    background: var(--secondary);
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.account-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.account-name {
+    font-weight: 500;
+    font-size: 1.1rem;
+}
+
+.account-action {
+    margin: 0;
+}
+
+/* Auth Form */
+.form-wrapper {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.auth-form {
+    background: #1a1a1a;
+    padding: 2rem;
+    border-radius: 18px;
+}
+
+.form-field {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #333;
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-input:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 126, 185, 0.1);
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.btn.secondary {
+    background: #333;
+    color: var(--text);
+}
+
+.btn.secondary:hover {
+    background: #444;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .account-info {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .form-wrapper {
+        padding: 0 15px;
+    }
+    
+    .auth-form {
+        padding: 1.5rem;
+    }
+}
+
+/* Tabs adaptive */
+@media (max-width: 1024px) {
+    .tabs {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    
+    .tab {
+        flex: 1 1 calc(50% - 6px);
+        text-align: center;
+        padding: 12px 16px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .tabs {
+        gap: 4px;
+    }
+    
+    .tab {
+        flex: 1 1 100%;
+        font-size: 0.85rem;
+        padding: 10px 12px;
+        border-radius: 8px;
+    }
+    
+    .tab-content {
+        padding: 1.5rem;
+        border-radius: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .track-card {
+        padding: 1rem;
+    }
+    
+    .track-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .track-body {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        padding-top: 1rem;
+    }
+    
+    .btn.small {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .cover-upload img {
+        width: 100%;
+        height: auto;
+        max-width: 300px;
+    }
+    
+    .form-field-group {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Для форм внутри вкладок */
+.tab-content form {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.tab-content form p {
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .tab-content form {
+        gap: 1rem;
+    }
+    
+    .tab-content h1 {
+        font-size: 1.5rem;
+    }
+}
+
+/* Вертикальное выравнивание для мобилок */
+@media (max-width: 640px) {
+    .nav-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .nav-center {
+        order: 2;
+        margin: 1rem 0;
+    }
+    
+    .nav-right {
+        order: 3;
+        text-align: center;
+    }
+    
+    .logo-link {
+        order: 1;
+        text-align: center;
+    }
 }

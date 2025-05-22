@@ -4,19 +4,22 @@ from flask import Blueprint, render_template, redirect, request, url_for, flash,
 from flask_login import login_required, current_user
 from werkzeug.utils import safe_join
 from models import db, Release, Track, Users
-from client.forms import ReleaseForm, CreateSubForm, TrackForm, PromoForm, VideoForm
+from client.forms import ReleaseForm, CreateSubForm, TrackForm, PromoForm, VideoForm, ProdbyForm, EditForm
 
-from PIL import Image
-from io import BytesIO
+from utils import delete_file, validate_audio, validate_image, validate_pdf
 
 client = Blueprint("client", __name__)
 UPLOAD_FOLDER = "files"
+MAX_SUB = 3
 
 
 @client.route("/")
 @login_required
 def dashboard():
-    return render_template("dashboard.html", user=current_user)
+    if (current_user.is_artist or current_user.is_sub):
+        return redirect(url_for("client.releases"))
+    else:
+        return render_template("dashboard.html", user=current_user)
 
 
 @client.route('/uploads/<path:filename>')
@@ -52,32 +55,24 @@ def create_release():
     if not (current_user.is_artist or current_user.is_sub):
         flash("Access denied")
         return redirect(url_for("client.dashboard"))
-    
+
     form = ReleaseForm()
 
     if request.method == "POST" and form.validate_on_submit():
         cover_rel_path = None
-        
-        if not form.cover.data:
-            flash("Обложка обязательна")
+
+        cover_error = validate_image(form.cover.data)
+        if cover_error:
+            flash(cover_error)
             return render_template("create_release.html", form=form)
-        else:
-            image_bytes = form.cover.data.read()
-            image = Image.open(BytesIO(image_bytes))
 
-            width, height = image.size
-            if not (3000 <= width <= 3500 and 3000 <= height <= 3500):
-                flash("Размер обложки должен быть от 3000x3000 до 3500x3500 пикселей")
-                return render_template("create_release.html", form=form)
-
-            form.cover.data.stream.seek(0)
-
-            ext = os.path.splitext(form.cover.data.filename)[1]
-            unique_cover_filename = f"{uuid.uuid4().hex}{ext}"
-            cover_rel_path = f"covers/{unique_cover_filename}"
-            cover_full_path = os.path.join(UPLOAD_FOLDER, cover_rel_path)
-            os.makedirs(os.path.dirname(cover_full_path), exist_ok=True)
-            form.cover.data.save(cover_full_path)
+        ext = os.path.splitext(form.cover.data.filename)[1]
+        unique_cover_filename = f"{uuid.uuid4().hex}{ext}"
+        cover_rel_path = f"covers/{unique_cover_filename}"
+        cover_full_path = os.path.join(UPLOAD_FOLDER, cover_rel_path)
+        os.makedirs(os.path.dirname(cover_full_path), exist_ok=True)
+        form.cover.data.stream.seek(0)
+        form.cover.data.save(cover_full_path)
 
         release = Release(
             title=form.title.data,
@@ -89,7 +84,7 @@ def create_release():
             release_type=form.release_type.data,
             release_date=form.release_date.data,
             upc=form.upc.data,
-            cover_path=cover_rel_path,  
+            cover_path=cover_rel_path,
             user_id=current_user.id,
             comment=form.comment.data,
             status=1
@@ -99,8 +94,8 @@ def create_release():
 
         track_index = 0
         while f"tracks-{track_index}-title" in request.form:
+            # Инициализация формы
             track_form = TrackForm(formdata=None)
-
             track_form.title.data = request.form.get(f"tracks-{track_index}-title")
             track_form.version.data = request.form.get(f"tracks-{track_index}-version")
             track_form.main_artists.data = request.form.get(f"tracks-{track_index}-main_artists")
@@ -113,6 +108,16 @@ def create_release():
 
             audio_file = request.files.get(f"tracks-{track_index}-audio_file")
             pdf_file = request.files.get(f"tracks-{track_index}-pdf_file")
+
+            audio_error = validate_audio(audio_file)
+            if audio_error:
+                flash(f"Трек {track_index + 1}: {audio_error}")
+                return render_template("create_release.html", form=form)
+
+            pdf_error = validate_pdf(pdf_file)
+            if pdf_error:
+                flash(f"Трек {track_index + 1}: {pdf_error}")
+                return render_template("create_release.html", form=form)
 
             audio_rel_path = None
             pdf_rel_path = None
@@ -150,12 +155,12 @@ def create_release():
             db.session.add(track)
             track_index += 1
 
-
         db.session.commit()
         flash("Релиз успешно создан")
         return redirect(url_for("client.dashboard"))
 
     return render_template("create_release.html", form=form)
+
 
 
 @client.route('/delete_release/<int:release_id>', methods=['POST'])
@@ -167,11 +172,26 @@ def delete_release(release_id):
         flash("У вас нет прав на удаление этого релиза.")
         return redirect(url_for('client.release_detail', release_id=release_id))
 
+    # files
+    cover_full_path = os.path.join(UPLOAD_FOLDER, release.cover_path)
+    delete_file(cover_full_path)
+    
+    for track in release.tracks:
+        if track.pdf_path:
+            pdf_full_path = os.path.join(UPLOAD_FOLDER, track.pdf_path)
+            delete_file(pdf_full_path)
+        
+        if track.audio_path:
+            audio_full_path = os.path.join(UPLOAD_FOLDER, track.audio_path)
+            delete_file(audio_full_path)
+
+    # db
     for track in release.tracks:
         db.session.delete(track)
 
     db.session.delete(release)
     db.session.commit()
+    
     flash("Релиз и все его треки удалены.")
     return redirect(url_for('client.releases'))
 
@@ -188,11 +208,16 @@ def release(release_id):
     if release.status in [2, 3]:
         promo_form = PromoForm()
         video_form = VideoForm()
+        prodby_form = ProdbyForm()
+        edit_form = EditForm()
+
         
         if request.method == "POST" and promo_form.validate_on_submit():
             release.promo1 = promo_form.promo1.data
             release.promo2 = promo_form.promo2.data
             release.promo3 = promo_form.promo3.data
+            
+            release.status = 1
             
             db.session.commit()
             flash("Запрос на промо добавлен")
@@ -200,11 +225,34 @@ def release(release_id):
         if request.method == "POST" and video_form.validate_on_submit():
             release.video = video_form.video.data
             
+            release.status = 1
+            
             db.session.commit()
             flash("Запрос на видеошот добавлен")
             
+        if request.method == "POST" and edit_form.validate_on_submit():
+            release.edit = edit_form.edit.data
+            
+            release.status = 1
+            
+            db.session.commit()
+            flash("Запрос на изменение добавлен")
+            
+        if request.method == "POST" and prodby_form.validate_on_submit():
+            release.prodby = prodby_form.prodby.data
+            
+            release.status = 1
+            
+            db.session.commit()
+            flash("Запрос на prodby добавлен")
+            
         
-        return render_template("release.html", release=release, promo_form=promo_form, video_form=video_form)
+        return render_template("release.html", 
+                               release=release, 
+                               promo_form=promo_form, 
+                               video_form=video_form,
+                               prodby_form=prodby_form,
+                               edit_form=edit_form)
     
     return render_template("release.html", release=release)
 
@@ -213,15 +261,15 @@ def release(release_id):
 @login_required
 def edit_release(release_id):
     release = Release.query.filter_by(id=release_id, user_id=current_user.id).first_or_404()
-    
+
     if not (current_user.is_artist or current_user.is_sub):
         flash("Access denied")
         return redirect(url_for("client.dashboard"))
-    
+
     if release.status not in [0, 1]:
         flash("Access denied")
         return redirect(url_for("client.dashboard"))
-    
+
     form = ReleaseForm()
 
     if request.method == "POST" and form.validate_on_submit():
@@ -237,24 +285,20 @@ def edit_release(release_id):
         release.comment = form.comment.data
 
         if form.cover.data:
-            image_bytes = form.cover.data.read()
-            image = Image.open(BytesIO(image_bytes))
-
-            width, height = image.size
-            if not (3000 <= width <= 3500 and 3000 <= height <= 3500):
-                flash("Размер обложки должен быть от 3000x3000 до 3500x3500 пикселей")
+            cover_error = validate_image(form.cover.data)
+            if cover_error:
+                flash(cover_error)
                 return render_template("edit_release.html", form=form, release=release)
 
-            form.cover.data.stream.seek(0)
             ext = os.path.splitext(form.cover.data.filename)[1]
             unique_cover_filename = f"{uuid.uuid4().hex}{ext}"
             cover_rel_path = f"covers/{unique_cover_filename}"
             cover_full_path = os.path.join(UPLOAD_FOLDER, cover_rel_path)
             os.makedirs(os.path.dirname(cover_full_path), exist_ok=True)
+            form.cover.data.stream.seek(0)
             form.cover.data.save(cover_full_path)
             release.cover_path = cover_rel_path
 
-        # Удалим все старые треки (можно заменить на более умную синхронизацию при необходимости)
         Track.query.filter_by(release_id=release.id).delete()
 
         track_index = 0
@@ -272,6 +316,16 @@ def edit_release(release_id):
 
             audio_file = request.files.get(f"tracks-{track_index}-audio_file")
             pdf_file = request.files.get(f"tracks-{track_index}-pdf_file")
+
+            audio_error = validate_audio(audio_file)
+            if audio_error:
+                flash(f"Трек {track_index + 1}: {audio_error}")
+                return render_template("edit_release.html", form=form, release=release)
+
+            pdf_error = validate_pdf(pdf_file)
+            if pdf_error:
+                flash(f"Трек {track_index + 1}: {pdf_error}")
+                return render_template("edit_release.html", form=form, release=release)
 
             audio_rel_path = None
             pdf_rel_path = None
@@ -311,10 +365,8 @@ def edit_release(release_id):
 
         db.session.commit()
         flash("Релиз обновлён")
-                
         return redirect(url_for("client.releases"))
 
-    # Подгружаем данные в форму
     elif request.method == "GET":
         form.title.data = release.title
         form.version.data = release.version
@@ -326,10 +378,48 @@ def edit_release(release_id):
         form.release_date.data = release.release_date
         form.upc.data = release.upc
         form.comment.data = release.comment
-        
-               
 
     return render_template("edit_release.html", form=form, release=release)
+
+
+
+
+@client.route('/delete_sub/<int:user_id>', methods=['POST'])
+@login_required
+def delete_sub(user_id):
+    user = Users.query.get_or_404(user_id)
+
+    if not current_user.is_artist:
+        flash("Недоступно")
+        return redirect(url_for('client.subs'))
+    
+    if not (user.is_sub and user.creator_id == current_user.id):
+        flash("Пользователь недоступен")
+        return redirect(url_for('client.subs'))
+
+    for release in user.releases:
+        
+        cover_full_path = os.path.join(UPLOAD_FOLDER, release.cover_path)
+        delete_file(cover_full_path)
+        
+        for track in release.tracks:
+            if track.pdf_path:
+                pdf_full_path = os.path.join(UPLOAD_FOLDER, track.pdf_path)
+                delete_file(pdf_full_path)
+            
+            if track.audio_path:
+                audio_full_path = os.path.join(UPLOAD_FOLDER, track.audio_path)
+                delete_file(audio_full_path)
+        
+            db.session.delete(track)
+            
+        db.session.delete(release)
+
+    db.session.delete(user)
+    db.session.commit()
+    
+    flash("Пользователь и все связанные данные удалены.")
+    return redirect(url_for('client.subs'))
 
 
 
@@ -337,22 +427,8 @@ def edit_release(release_id):
 @login_required
 def subs():
     if not current_user.is_artist:
-        flash("Access denied")
+        flash("У вас нет доступа к этой странице")
         return redirect(url_for("client.dashboard"))
-
-    if request.method == "POST":
-        action = request.form.get("action")
-        user_id = request.form.get("user_id")
-        user = Users.query.get(user_id)
-
-        if not user or user.creator_id != current_user.id:
-            flash("Нет доступа к этому аккаунту.")
-            return redirect(url_for("client.subs"))
-
-        if action == "delete":
-            db.session.delete(user)
-            db.session.commit()
-            flash(f"Саб аккаунт {user.username} удалён.")
 
     users = Users.query.filter_by(creator_id=current_user.id).all()
     return render_template("subs.html", users=users)
@@ -363,7 +439,12 @@ def subs():
 @login_required
 def create_sub():
     if not current_user.is_artist:
-        flash("Access denied")
+        flash("У вас нет доступа к этой страниц")
+        return redirect(url_for("client.dashboard"))
+    
+    users = Users.query.filter_by(creator_id=current_user.id).all()
+    if len(users) >= MAX_SUB:
+        flash(f"Нельзя создать больше {MAX_SUB} сабаккаунтов")
         return redirect(url_for("client.dashboard"))
 
     form = CreateSubForm()
