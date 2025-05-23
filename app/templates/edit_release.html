@@ -5,6 +5,7 @@
     <title>Редактирование релиза</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/release.css') }}">
     <script src="{{ url_for('static', filename='js/release.js') }}"></script>
+    <link rel="icon" href="{{ url_for('static', filename='img/favicon.png') }}">
 </head>
 <body>
 {% include 'flash_messages.html' %}
@@ -114,8 +115,8 @@
                             <p>Версия: <input value="{{track_field.version}}" type="text" name="tracks-{{ loop.index0 }}-version"></p>
                             <p>Основные артисты: <input value="{{track_field.main_artists}}" type="text" name="tracks-{{ loop.index0 }}-main_artists"></p>
                             <p>Дополнительные артисты: <input value="{{track_field.featured_artists}}" type="text" name="tracks-{{ loop.index0 }}-featured_artists"></p>
-                            <p>Автор: <input value="{{track_field.author}}" type="text" name="tracks-{{ loop.index0 }}-author"></p>
-                            <p>Композитор: <input value="{{track_field.composer}}" type="text" name="tracks-{{ loop.index0 }}-composer"></p>
+                            <p>ФИО автора: <input value="{{track_field.author}}" type="text" name="tracks-{{ loop.index0 }}-author"></p>
+                            <p>ФИО композитора: <input value="{{track_field.composer}}" type="text" name="tracks-{{ loop.index0 }}-composer"></p>
                             <p>TikTok старт (сек): <input value="{% if track_field.tiktok_start != "None" %}{{track_field.tiktok_start}}{% endif %}" type="text" name="tracks-{{ loop.index0 }}-tiktok_start"></p>
                             <p>ISRC: <input value="{{track_field.isrc}}" type="text" name="tracks-{{ loop.index0 }}-isrc"></p>
                             <p>Explicit: 
@@ -146,8 +147,8 @@
                         <p>Версия: <input value="{{track_field.version}}" type="text" name="tracks-{{ loop.index0 }}-version"></p>
                         <p>Основные артисты: <input value="{{track_field.main_artists}}" type="text" name="tracks-{{ loop.index0 }}-main_artists"></p>
                         <p>Дополнительные артисты: <input value="{{track_field.featured_artists}}" type="text" name="tracks-{{ loop.index0 }}-featured_artists"></p>
-                        <p>Автор: <input value="{{track_field.author}}" type="text" name="tracks-{{ loop.index0 }}-author"></p>
-                        <p>Композитор: <input value="{{track_field.composer}}" type="text" name="tracks-{{ loop.index0 }}-composer"></p>
+                        <p>ФИО автора: <input value="{{track_field.author}}" type="text" name="tracks-{{ loop.index0 }}-author"></p>
+                        <p>ФИО композитора: <input value="{{track_field.composer}}" type="text" name="tracks-{{ loop.index0 }}-composer"></p>
                         <p>TikTok старт (сек): <input value="{{track_field.tiktok_start}}" type="text" name="tracks-{{ loop.index0 }}-tiktok_start"></p>
                         <p>ISRC: <input value="{{track_field.isrc}}" type="text" name="tracks-{{ loop.index0 }}-isrc"></p>
                         <p>Explicit: 
