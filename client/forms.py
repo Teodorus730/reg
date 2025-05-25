@@ -17,7 +17,7 @@ class TrackForm(FlaskForm):
     composer = StringField("ФИО композитора", validators=[DataRequired()])
     tiktok_start = StringField("Старт TikTok (сек)", validators=[DataRequired()])
     isrc = StringField("ISRC")
-    explicit = SelectField("Ненормативная лексика", choices=[("False", "Нет"), ("True", "Да")], validators=[DataRequired()])
+    explicit = SelectField("Ненормативная лексика", choices=[("", ""), ("False", "Нет"), ("True", "Да")], validators=[DataRequired()])
     audio_file = FileField("Загрузка аудиофайла", validators=[FileAllowed(["wav"], "Только WAV"), DataRequired()])
     pdf_file = FileField("Загрузка PDF-файла", validators=[Optional(), FileAllowed(["pdf"], "Только PDF")])
 
@@ -28,7 +28,7 @@ class ReleaseForm(FlaskForm):
     featured_artists = StringField("Дополнительные артисты", validators=[Optional()])
     copyright = StringField("Копирайт", validators=[DataRequired()])
     genre = SelectField("Жанр", choices=genres, validators=[DataRequired()])
-    release_type = SelectField("Тип релиза", choices=[("Album", "Album"), ("Single", "Single"), ("ЕР", "ЕР")], validators=[DataRequired()])
+    release_type = SelectField("Тип релиза", choices=[("Single", "Single"), ("EP", "EP"), ("Album", "Album")], validators=[DataRequired()])
     release_date = DateField("Дата релиза", validators=[DataRequired()])
     upc = StringField("UPC", validators=[Optional()])
     cover = FileField("Обложка", validators=[Optional(), FileAllowed(["png", "jpg", "jpeg"], "Только изображения")])

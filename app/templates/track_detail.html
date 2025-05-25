@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Детали трека</title>
+    <title>BM Digital</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/release.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='img/favicon.png') }}">
 </head>
@@ -29,15 +29,17 @@
         <h1 class="page-title">{{ track.title }}</h1>
 
         <div class="track-detail">
-            <div class="track-info-card">
-                <div class="meta-grid">
-                    <strong>Версия: {{ track.version or "-" }}</strong>
-                    <strong>Артисты: {{ track.main_artists or "-" }}</strong>
-                    <strong>Доп Артисты: {{ track.featured_artists or "-" }}</strong>
-                    <strong>Автор: {{ track.author or "-" }}</strong>
-                    <strong>Композитор: {{ track.composer or "-" }}</strong>
-                    <strong>Explicit: {{ "Да" if track.explicit else "Нет" }}</strong>
-                    <strong>TikTok старт: {{ track.tiktok_start or 0 }}</strong>
+            <div class="track-info-c">
+                <div class="detail-section">
+                    <div class="mera-grid">
+                        <strong>Версия: {{ track.version or "-" }}</strong><br>
+                        <strong>Артисты: {{ track.main_artists or "-" }}</strong><br>
+                        <strong>Доп Артисты: {{ track.featured_artists or "-" }}</strong><br>
+                        <strong>Автор: {{ track.author or "-" }}</strong><br>
+                        <strong>Композитор: {{ track.composer or "-" }}</strong><br>
+                        <strong>Ненормативная лексика: {{ "Да" if track.explicit else "Нет" }}</strong><br>
+                        <strong>TikTok старт: {{ track.tiktok_start or 0 }}</strong><br>
+                    </div>
                 </div>
                 <br>
                 <div class="file-links">

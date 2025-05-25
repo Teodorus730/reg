@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="utf-8">
-    <title>Создание релиза</title>
+    <title>BM Digital</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/release.css') }}">
     <script src="{{ url_for('static', filename='js/release.js') }}"></script>
     <link rel="icon" href="{{ url_for('static', filename='img/favicon.png') }}">
@@ -100,21 +100,22 @@
                     </div>
                 </div>
                 <div class="track-body active" id="track-body-{{ loop.index0 }}">
-                    <p>Название: <input value="{{track_field.title}}" type="text" name="tracks-{{ loop.index0 }}-title" oninput="updateTrackTitle({{ loop.index0 }})"></p>
+                    <p><span class="datareq">*</span>Название:<input value="{{track_field.title}}" type="text" name="tracks-{{ loop.index0 }}-title" oninput="updateTrackTitle({{ loop.index0 }})"></p>
                     <p>Версия: <input value="{{track_field.version}}" type="text" name="tracks-{{ loop.index0 }}-version"></p>
-                    <p>Основные артисты: <input value="{{track_field.main_artists}}" type="text" name="tracks-{{ loop.index0 }}-main_artists"></p>
+                    <p><span class="datareq">*</span>Основные артисты: <input value="{{track_field.main_artists}}" type="text" name="tracks-{{ loop.index0 }}-main_artists"></p>
                     <p>Дополнительные артисты: <input value="{{track_field.featured_artists}}" type="text" name="tracks-{{ loop.index0 }}-featured_artists"></p>
-                    <p>ФИО автора: <input value="{{track_field.author}}" type="text" name="tracks-{{ loop.index0 }}-author"></p>
-                    <p>ФИО композитора: <input value="{{track_field.composer}}" type="text" name="tracks-{{ loop.index0 }}-composer"></p>
-                    <p>TikTok старт (сек): <input value="{{track_field.tiktok_start}}" type="text" name="tracks-{{ loop.index0 }}-tiktok_start"></p>
+                    <p><span class="datareq">*</span>ФИО автора:<input value="{{track_field.author}}" type="text" name="tracks-{{ loop.index0 }}-author"></p>
+                    <p><span class="datareq">*</span>ФИО композитора:<input value="{{track_field.composer}}" type="text" name="tracks-{{ loop.index0 }}-composer"></p>
+                    <p><span class="datareq">*</span>TikTok старт (сек): <input value="{{track_field.tiktok_start}}" type="text" name="tracks-{{ loop.index0 }}-tiktok_start"></p>
                     <p>ISRC: <input value="{{track_field.isrc}}" type="text" name="tracks-{{ loop.index0 }}-isrc"></p>
-                    <p>Explicit: 
+                    <p><span class="datareq">*</span>Ненормативная лексика: 
                         <select name="tracks-{{ loop.index0 }}-explicit">
+                            <option value="" {% if track_field.explicit == '' %}selected{% endif %}></option>
                             <option value="False" {% if track_field.explicit == 'False' %}selected{% endif %}>Нет</option>
                             <option value="True" {% if track_field.explicit == 'True' %}selected{% endif %}>Да</option>
                         </select>
                     </p>
-                    <p>Аудио (WAV): <input type="file" name="tracks-{{ loop.index0 }}-audio_file" accept=".wav"></p>
+                    <p><span class="datareq">*</span>Аудио (WAV): <input type="file" name="tracks-{{ loop.index0 }}-audio_file" accept=".wav"></p>
                     <p>PDF: <input type="file" name="tracks-{{ loop.index0 }}-pdf_file" accept=".pdf"></p>
                 </div>
             </div>
@@ -140,21 +141,22 @@
             </div>
         </div>
         <div class="track-body active" id="track-body-__prefix__">
-            <p>Название: <input type="text" name="tracks-__prefix__-title" oninput="updateTrackTitle(__prefix__)"></p>
+            <p><span class="datareq">*</span>Название:<input type="text" name="tracks-__prefix__-title" oninput="updateTrackTitle(__prefix__)"></p>
             <p>Версия: <input type="text" name="tracks-__prefix__-version"></p>
-            <p>Основные артисты: <input type="text" name="tracks-__prefix__-main_artists"></p>
+            <p><span class="datareq">*</span>Основные артисты: <input type="text" name="tracks-__prefix__-main_artists"></p>
             <p>Дополнительные артисты: <input type="text" name="tracks-__prefix__-featured_artists"></p>
-            <p>Автор: <input type="text" name="tracks-__prefix__-author"></p>
-            <p>Композитор: <input type="text" name="tracks-__prefix__-composer"></p>
-            <p>TikTok старт (сек): <input type="text" name="tracks-__prefix__-tiktok_start"></p>
+            <p><span class="datareq">*</span>ФИО автора: <input type="text" name="tracks-__prefix__-author"></p>
+            <p><span class="datareq">*</span>ФИО композитора: <input type="text" name="tracks-__prefix__-composer"></p>
+            <p><span class="datareq">*</span>TikTok старт (сек): <input type="text" name="tracks-__prefix__-tiktok_start"></p>
             <p>ISRC: <input type="text" name="tracks-__prefix__-isrc"></p>
-            <p>Explicit: 
+            <p><span class="datareq">*</span>Ненормативная лексика: 
                 <select name="tracks-__prefix__-explicit">
+                    <option value=""></option>
                     <option value="False">Нет</option>
                     <option value="True">Да</option>
                 </select>
             </p>
-            <p>Аудио (WAV): <input type="file" name="tracks-__prefix__-audio_file" accept=".wav"></p>
+            <p><span class="datareq">*</span>Аудио (WAV): <input type="file" name="tracks-__prefix__-audio_file" accept=".wav"></p>
             <p>PDF: <input type="file" name="tracks-__prefix__-pdf_file" accept=".pdf"></p>
         </div>
     </div>

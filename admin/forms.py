@@ -8,7 +8,7 @@ class CreateUserForm(FlaskForm):
     password = StringField("Пароль", validators=[DataRequired()])
     user_type = SelectField(
         "Тип аккаунта",
-        choices=[("admin", "Админ"), ("moder", "Модератор"), ("artist", "Артист"), ("sub", "Саб аккаунт")],
+        choices=[("", ""), ("admin", "Админ"), ("moder", "Модератор"), ("artist", "Артист"), ("sub", "Саб аккаунт")],
         validators=[DataRequired()]
     )
     submit = SubmitField("Создать пользователя")

@@ -2,137 +2,179 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Мои релизы</title>
+    <title>BM Digital</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/release.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='img/favicon.png') }}">
 </head>
 <body>
 {% include 'flash_messages.html' %}
 
-    <nav class="main-nav">
-        <div class="nav-container">
-            <!-- Логотип слева -->
-            <a href="{{ url_for('client.releases') }}" class="logo-link">
-                <img src="{{ url_for('static', filename='img/logo.png') }}" 
-                    alt="Логотип" 
-                    class="nav-logo">
-            </a>
+<nav class="main-nav">
+    <div class="nav-container">
+        <a href="{{ url_for('client.releases') }}" class="logo-link">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Логотип" class="nav-logo">
+        </a>
 
-            <!-- Центральное меню -->
-            <div class="nav-center">
-                <a href="{{ url_for('client.releases') }}" class="nav-btn active">Мои релизы</a>
-                <a href="{{ url_for('client.create_release') }}" class="nav-btn">Создать релиз</a>
-                <a href="{{ url_for('client.subs') }}" class="nav-btn">Саб аккаунты</a>
-            </div>
-
-            <!-- Кнопка выхода справа -->
-            <div class="nav-right">
-                <a href="{{ url_for('auth.logout') }}" class="nav-btn logout">Выйти</a>
-            </div>
+        <div class="nav-center">
+            <a href="{{ url_for('client.releases') }}" class="nav-btn active">Мои релизы</a>
+            <a href="{{ url_for('client.create_release') }}" class="nav-btn">Создать релиз</a>
+            <a href="{{ url_for('client.subs') }}" class="nav-btn">Саб аккаунты</a>
         </div>
-    </nav>
 
-    <div class="container releases-container">
-        <h1 class="page-title">Ваши релизы</h1>
+        <div class="nav-right">
+            <a href="{{ url_for('auth.logout') }}" class="nav-btn logout">Выйти</a>
+        </div>
+    </div>
+</nav>
 
-        {% if releases %}
-            <div class="releases-grid">
-                {% for release in releases %}
-                    <div class="release-card">
-                        <div class="release-header">
-                            <span class="status-badge status-{{ release.status }}">
-                                {% if release.status == 0 %}
-                                    Отклонен
-                                {% elif release.status == 1 %}
-                                    На рассмотрении
-                                {% elif release.status == 2 %}
-                                    Одобрен
-                                {% elif release.status == 3 %}
-                                    Опубликован
-                                {% endif %}
-                            </span>
-                            {% if release.status == 0 or release.status == 1 %}
-                                <a href="{{ url_for('client.edit_release', release_id=release.id) }}" class="edit-btn">✎</a>
+<div class="container releases-container">
+    <h1 class="page-title">Ваши релизы</h1>
+
+    <!-- Фильтры -->
+    <form method="get" class="status-filter">
+        <div class="filter-section">
+
+            <label class="form-label">Фильтр по названию:<br><br>
+                <input type="text" name="title" class="form-input" placeholder="Название релиза"
+                       value="{{ title_filter }}" onchange="this.form.submit()">
+            </label>
+
+            <label class="form-label">Фильтр по статусу:<br><br>
+                <select name="status" class="form-input" onchange="this.form.submit()">
+                    <option value="">Все</option>
+                    <option value="0" {% if status_filter == '0' %}selected{% endif %}>Отклонен</option>
+                    <option value="1" {% if status_filter == '1' %}selected{% endif %}>На рассмотрении</option>
+                    <option value="2" {% if status_filter == '2' %}selected{% endif %}>Одобрен</option>
+                    <option value="3" {% if status_filter == '3' %}selected{% endif %}>Опубликован</option>
+                    <option value="4" {% if status_filter == '4' %}selected{% endif %}>На редактировании</option>
+                </select>
+            </label>
+
+            <label class="form-label">Фильтр по пользователю:<br><br>
+                <select name="username" class="form-input" onchange="this.form.submit()">
+                    <option value="">Все</option>
+                    <option value="{{main_username}}" {% if username_filter == main_username %}selected{% endif %}>Главный аккаунт</option>
+                    {% for username in usernames %}
+                        <option value="{{username}}" {% if username_filter == username %}selected{% endif %}>{{username}}</option>
+                    {% endfor %}
+                </select>
+            </label>
+         </div>
+    </form>
+
+    {% if releases %}
+        <div class="releases-grid">
+            {% for release in releases %}
+                <div class="release-card">
+                    <div class="release-header">
+                        <span class="status-badge status-{{ release.status }}">
+                            {% if release.status == 0 %}
+                                Отклонен
+                            {% elif release.status == 1 %}
+                                На рассмотрении
+                            {% elif release.status == 2 %}
+                                Одобрен
+                            {% elif release.status == 3 %}
+                                Опубликован
+                            {% elif release.status == 4 %}
+                                На редактировании
+                            {% endif %}
+                        </span>
+                        {% if release.status == 0 or release.status == 1 %}
+                            <a href="{{ url_for('client.edit_release', release_id=release.id) }}" class="edit-btn">✎</a>
+                        {% endif %}
+                    </div>
+
+                    <div class="release-content">
+                        <div class="cover-container">
+                            {% if release.cover_path %}
+                                <img src="{{ url_for('client.uploaded_file', filename=release.cover_path) }}"
+                                     alt="Обложка" class="release-cover">
+                            {% else %}
+                                <img src="{{ url_for('static', filename='img/placeholder.png') }}"
+                                     alt="Без обложки" class="release-cover">
                             {% endif %}
                         </div>
-                        
-                        <div class="release-content">
-                            <div class="cover-container">
-                                {% if release.cover_path %}
-                                    <img src="{{ url_for('client.uploaded_file', filename=release.cover_path) }}" 
-                                         alt="Обложка" 
-                                         class="release-cover">
-                                {% else %}
-                                    <img src="{{ url_for('static', filename='img/placeholder.png') }}" 
-                                         alt="Без обложки" 
-                                         class="release-cover">
-                                {% endif %}
-                            </div>
-                            
-                            <div class="release-info">
-                                <h2 class="release-title">
-                                    <a href="{{ url_for('client.release', release_id=release.id) }}">{{ release.title }}</a>
-                                </h2>
-                                
-                                <div class="release-meta">
-                                    <div class="meta-item">
-                                        <span class="meta-label">Дата релиза:</span>
-                                        <span class="meta-value">{{ release.release_date or "—" }}</span>
-                                    </div>
-                                    <div class="meta-item">
-                                        <span class="meta-label">Жанр:</span>
-                                        <span class="meta-value">{{ release.genre or "—" }}</span>
-                                    </div>
-                                    <div class="meta-item">
-                                        <span class="meta-label">Тип:</span>
-                                        <span class="meta-value">{{ release.release_type or "—" }}</span>
-                                    </div>
+
+                        <div class="release-info">
+                            <h2 class="release-title">
+                                <a href="{{ url_for('client.release', release_id=release.id) }}">{{ release.title }}</a>
+                            </h2>
+
+                            <div class="release-meta">
+                                <div class="meta-item">
+                                    <span class="meta-label">Артисты:</span>
+                                    <span class="meta-value">{{ release.main_artists }}</span>
                                 </div>
-                                
-                                <details class="tracklist">
-                                    <summary class="tracklist-summary">
-                                        <span>Трек-лист ({{ release.tracks|length }})</span>
-                                        <div class="chevron"></div>
-                                    </summary>
-                                    <div class="tracklist-content">
-                                        {% for track in release.tracks %}
-                                            <div class="track-item">
-                                                <div class="track-info">
-                                                    <span class="track-icon">🎵</span>
-                                                    <span class="track-title">{{ track.title }}</span>
-                                                    <span class="track-title">({{ track.main_artists }})</span>
-                                                    {% if track.version %}
-                                                        <span class="track-version">({{ track.version }})</span>
-                                                    {% endif %}
-                                                </div>
-                                                {% if track.audio_path %}
-                                                    <a href="{{ url_for('client.uploaded_file', filename=track.audio_path) }}" 
-                                                       target="_blank" 
-                                                       class="track-link">
-                                                        Слушать
-                                                    </a>
+                                <div class="meta-item">
+                                    <span class="meta-label">Версия:</span>
+                                    <span class="meta-value">{{ release.version or "—" }}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">Жанр:</span>
+                                    <span class="meta-value">{{ release.genre or "—" }}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">Дата релиза:</span>
+                                    <span class="meta-value">{{ release.release_date or "—" }}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">UPC:</span>
+                                    <span class="meta-value">{{ release.upc or "—" }}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">Пользователь:</span>
+                                    <span class="meta-value">
+                                        {% if release.user.user_type == "artist" %}
+                                            Главный аккаунт
+                                        {% else %}
+                                            {{ release.user.username }}
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <details class="tracklist">
+                                <summary class="tracklist-summary">
+                                    <span>Трек-лист ({{ release.tracks|length }})</span>
+                                    <div class="chevron"></div>
+                                </summary>
+                                <div class="tracklist-content">
+                                    {% for track in release.tracks %}
+                                        <div class="track-item">
+                                            <div class="track-info">
+                                                <span class="track-icon">🎵</span>
+                                                <span class="track-title">{{ track.title }}</span>
+                                                <span class="track-title">({{ track.main_artists }})</span>
+                                                {% if track.version %}
+                                                    <span class="track-version">({{ track.version }})</span>
                                                 {% endif %}
                                             </div>
-                                        {% else %}
-                                            <div class="empty-tracklist">Нет треков в этом релизе</div>
-                                        {% endfor %}
-                                    </div>
-                                </details>
-                            </div>
+                                            {% if track.audio_path %}
+                                                <a href="{{ url_for('client.uploaded_file', filename=track.audio_path) }}"
+                                                   target="_blank" class="track-link">
+                                                    Слушать
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    {% else %}
+                                        <div class="empty-tracklist">Нет треков в этом релизе</div>
+                                    {% endfor %}
+                                </div>
+                            </details>
                         </div>
                     </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="empty-state">
-                <img src="{{ url_for('static', filename='img/placeholder_noreleases.png') }}" 
-                     alt="Нет релизов" 
-                     class="empty-icon">
-                <p class="empty-text">У вас пока нет релизов</p>
-                <a href="{{ url_for('client.create_release') }}" class="btn">Создать первый релиз</a>
-            </div>
-        {% endif %}
-        
-    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <img src="{{ url_for('static', filename='img/placeholder_noreleases.png') }}"
+                 alt="Нет релизов" class="empty-icon">
+            <p class="empty-text">У вас пока нет релизов</p>
+            <a href="{{ url_for('client.create_release') }}" class="btn">Создать первый релиз</a>
+        </div>
+    {% endif %}
+</div>
 </body>
 </html>

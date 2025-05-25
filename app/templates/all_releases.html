@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Все релизы</title>
+    <title>BM Digital</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/release.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='img/favicon.png') }}">
 </head>
@@ -37,6 +37,7 @@
                         <option value="1" {% if status_filter == '1' %}selected{% endif %}>На рассмотрении</option>
                         <option value="2" {% if status_filter == '2' %}selected{% endif %}>Одобрен</option>
                         <option value="3" {% if status_filter == '3' %}selected{% endif %}>Опубликован</option>
+                        <option value="4" {% if status_filter == '4' %}selected{% endif %}>На редактировании</option>
                     </select>
                 </label>
             </form>
@@ -55,6 +56,8 @@
                             Одобрен
                         {% elif release.status == 3 %}
                             Опубликован
+                        {% elif release.status == 4 %}
+                            На редактировании
                         {% endif %}
                     </span>
                     <span class="user-badge">{{ release.user.username }}</span>

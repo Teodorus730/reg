@@ -67,10 +67,10 @@ function previewCover(event) {
     }
 }
 
-document.querySelector('form').addEventListener('submit', function(e) {
-    const coverInput = document.getElementById('cover-file');
-    if (!coverInput.files.length) {
-        e.preventDefault();
-        alert("Пожалуйста, загрузите обложку.");
-    }
-});
+// document.querySelector('form').addEventListener('submit', function(e) {
+//     const coverInput = document.getElementById('cover-file');
+//     if (!coverInput.files.length) {
+//         e.preventDefault();
+//         alert("Пожалуйста, загрузите обложку.");
+//     }
+// });

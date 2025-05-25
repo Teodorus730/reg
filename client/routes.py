@@ -46,9 +46,44 @@ def releases():
     if not (current_user.is_artist or current_user.is_sub):
         flash("Access denied")
         return redirect(url_for("client.dashboard"))
-    
-    releases = Release.query.filter_by(user_id=current_user.id).all()
-    return render_template("releases.html", releases=releases)
+
+    sub_accounts = Users.query.filter_by(creator_id=current_user.id).all()
+    usernames = list(map(lambda x: x.username, sub_accounts))
+    user_ids = [current_user.id] + [u.id for u in sub_accounts]
+
+    # Получаем фильтры из запроса
+    status = request.args.get("status")
+    username = request.args.get("username")
+    title = request.args.get("title", "").strip()
+
+    # Запрос релизов, привязанных к нужным пользователям
+    query = Release.query.join(Users).filter(Release.user_id.in_(user_ids))
+
+    # Фильтрация по статусу
+    if status and status.isdigit():
+        query = query.filter(Release.status == int(status))
+
+    # Фильтрация по username владельца релиза
+    if username:
+        query = query.filter(Users.username.ilike(f"%{username}%"))
+
+    # Фильтрация по названию релиза
+    if title:
+        query = query.filter(Release.title.ilike(f"%{title}%"))
+
+    # Сортировка по дате релиза
+    releases = query.order_by(Release.release_date.desc()).all()
+
+    return render_template(
+        "releases.html",
+        releases=releases,
+        status_filter=status or "",
+        username_filter=username or "",
+        title_filter=title,
+        usernames=usernames,
+        main_username=current_user.username
+    )
+
 
 
 @client.route("/create_release", methods=["GET", "POST"])
@@ -59,7 +94,7 @@ def create_release():
         return redirect(url_for("client.dashboard"))
 
     form = ReleaseForm()
-
+    
     if request.method == "POST" and form.validate_on_submit():
         cover_rel_path = None
 
@@ -207,7 +242,7 @@ def release(release_id):
         flash("Access denied")
         return redirect(url_for("client.dashboard"))
     
-    if release.status in [2, 3]:
+    if release.status in [2, 3, 4]:
         promo_form = PromoForm()
         video_form = VideoForm()
         prodby_form = ProdbyForm()
@@ -219,7 +254,7 @@ def release(release_id):
             release.promo2 = promo_form.promo2.data
             release.promo3 = promo_form.promo3.data
             
-            release.status = 1
+            release.status = 4
             
             db.session.commit()
             flash("Запрос на промо добавлен")
@@ -227,7 +262,7 @@ def release(release_id):
         if request.method == "POST" and video_form.validate_on_submit():
             release.video = video_form.video.data
             
-            release.status = 1
+            release.status = 4
             
             db.session.commit()
             flash("Запрос на видеошот добавлен")
@@ -235,7 +270,7 @@ def release(release_id):
         if request.method == "POST" and edit_form.validate_on_submit():
             release.edit = edit_form.edit.data
             
-            release.status = 1
+            release.status = 4
             
             db.session.commit()
             flash("Запрос на изменение добавлен")
@@ -243,7 +278,7 @@ def release(release_id):
         if request.method == "POST" and prodby_form.validate_on_submit():
             release.prodby = prodby_form.prodby.data
             
-            release.status = 1
+            release.status = 4
             
             db.session.commit()
             flash("Запрос на prodby добавлен")

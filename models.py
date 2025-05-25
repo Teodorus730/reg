@@ -53,16 +53,16 @@ class Release(db.Model):
     upc = db.Column(db.String(64))
     cover_path = db.Column(db.String(256))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    comment = db.Column(db.String(256))
+    comment = db.Column(db.String(512))
     answer = db.Column(db.String(256))
     
-    promo1 = db.Column(db.String(256))
-    promo2 = db.Column(db.String(256))
-    promo3 = db.Column(db.String(256))
+    promo1 = db.Column(db.String(2048))
+    promo2 = db.Column(db.String(2048))
+    promo3 = db.Column(db.String(2048))
     
     video = db.Column(db.String(256))
     
-    edit = db.Column(db.String(256))
+    edit = db.Column(db.String(512))
     
     prodby = db.Column(db.String(256))
 

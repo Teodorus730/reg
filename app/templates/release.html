@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="utf-8">
-    <title>Создание релиза</title>
+    <title>BM Digital</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/release.css') }}">
     <script src="{{ url_for('static', filename='js/release.js') }}"></script>
     <link rel="icon" href="{{ url_for('static', filename='img/favicon.png') }}">
@@ -38,7 +38,7 @@
     <div class="tabs">
         <div id="release-tab" class="tab active" onclick="showTab('release')">Информация о релизе</div>
         <div id="tracks-tab" class="tab" onclick="showTab('tracks')">Трек-лист</div>
-        {% if release.status == 2 or release.status == 3%}
+        {% if release.status == 2 or release.status == 3 or release.status == 4%}
         <div id="promo-tab" class="tab" onclick="showTab('promo')">Промо</div>
         <div id="video-tab" class="tab" onclick="showTab('video')">Видеошот</div>
         <div id="edit-tab" class="tab" onclick="showTab('edit')">Изменить</div>
@@ -75,6 +75,8 @@
                 Одобрен
             {% elif release.status == 3 %}
                 Опубликован
+            {% elif release.status == 4 %}
+                На редактировании
             {% endif %}
         </p>
         <p><strong>Комментарий:</strong> {{ release.comment or "-"}}</p>
@@ -100,7 +102,7 @@
                     <p>Композитор: {{track_field.composer}}</p>
                     <p>TikTok старт (сек): {{track_field.tiktok_start}}</p>
                     <p>ISRC: {{track_field.isrc  or "Не указан"}}</p>
-                    <p>Explicit: {{track_field.explicit}}</p>
+                    <p>Ненормативная лексика: {{ "Да" if track_field.explicit else "Нет" }}</p>
                     <p>Аудио (WAV): 
                     {% if track_field.audio_path %}
                         <a href="{{ url_for('client.uploaded_file', filename=track_field.audio_path) }}" target="_blank">Слушать</a>
@@ -122,7 +124,7 @@
         </div>
     </div>
 
-    {% if release.status == 2 or release.status == 3%}
+    {% if release.status == 2 or release.status == 3 or release.status == 4%}
         <div id="promo-content" class="tab-content">
             <h1>Добавить промо</h1>
             <form method="POST" enctype="multipart/form-data">
