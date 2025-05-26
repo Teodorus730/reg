@@ -32,7 +32,7 @@ class ReleaseForm(FlaskForm):
     release_date = DateField("Дата релиза", validators=[DataRequired()])
     upc = StringField("UPC", validators=[Optional()])
     cover = FileField("Обложка", validators=[Optional(), FileAllowed(["png", "jpg", "jpeg"], "Только изображения")])
-    comment = TextAreaField("Комментарий для модерации", validators=[Optional(), Length(min=3, max=250)])
+    comment = TextAreaField("Комментарий для модерации", validators=[Optional(), Length(min=3, max=500)])
 
     tracks = FieldList(FormField(TrackForm), min_entries=0)
     submit = SubmitField("Отправить")
@@ -45,9 +45,9 @@ class CreateSubForm(FlaskForm):
     
 
 class PromoForm(FlaskForm):
-    promo1 = TextAreaField("Что вы хотели выразить/высказать в композиции, о чем ваш релиз", validators=[DataRequired(), Length(min=3, max=250)])
-    promo2 = TextAreaField("Маркетинговая информация: все использованные и задуманные способы продвижения", validators=[DataRequired(), Length(min=3, max=250)])
-    promo3 = TextAreaField("Ваш посыл; в чем заключается творческая или нравственная идея вашей деятельности", validators=[DataRequired(), Length(min=3, max=250)])
+    promo1 = TextAreaField("Что вы хотели выразить/высказать в композиции, о чем ваш релиз", validators=[DataRequired(), Length(min=3, max=2000)])
+    promo2 = TextAreaField("Маркетинговая информация: все использованные и задуманные способы продвижения", validators=[DataRequired(), Length(min=3, max=2000)])
+    promo3 = TextAreaField("Ваш посыл; в чем заключается творческая или нравственная идея вашей деятельности", validators=[DataRequired(), Length(min=3, max=2000)])
     submit = SubmitField("Отправить")
 
 
@@ -57,7 +57,7 @@ class VideoForm(FlaskForm):
     
     
 class EditForm(FlaskForm):
-    edit = TextAreaField("Что вы хотите изменить?", validators=[DataRequired(), Length(min=3, max=250)])
+    edit = TextAreaField("Что вы хотите изменить?", validators=[DataRequired(), Length(min=3, max=500)])
     submit = SubmitField("Отправить")
     
     
