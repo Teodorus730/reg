@@ -37,7 +37,7 @@ def release_detail(release_id):
 
         if action == "update_status":
             new_status = request.form.get("status")
-            if new_status and new_status.isdigit() and int(new_status) in (0, 1, 2, 3):
+            if new_status and new_status.isdigit() and int(new_status) in (0, 1, 2, 3, 4):
                 release.status = int(new_status)
                 db.session.commit()
                 flash("Статус обновлён", "success")
