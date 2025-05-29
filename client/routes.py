@@ -208,6 +208,10 @@ def delete_release(release_id):
     if not (current_user.is_admin or current_user.id == release.user_id):
         flash("У вас нет прав на удаление этого релиза.")
         return redirect(url_for('client.release_detail', release_id=release_id))
+    
+    if not (release.status in [0, 1]):
+        flash("У вас нет прав на удаление этого релиза.")
+        return redirect(url_for('client.release_detail', release_id=release_id))
 
     # files
     cover_full_path = os.path.join(UPLOAD_FOLDER, release.cover_path)

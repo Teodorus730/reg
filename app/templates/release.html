@@ -41,10 +41,12 @@
         {% if release.status == 2 or release.status == 3 or release.status == 4%}
         <div id="promo-tab" class="tab" onclick="showTab('promo')">Промо</div>
         <div id="video-tab" class="tab" onclick="showTab('video')">Видеошот</div>
-        <div id="edit-tab" class="tab" onclick="showTab('edit')">Изменить</div>
         <div id="prodby-tab" class="tab" onclick="showTab('prodby')">Prod by</div>
+        <div id="edit-tab" class="tab" onclick="showTab('edit')">Изменить</div>
         {% endif %}
+        {% if release.status == 0 or release.status == 1 %}
         <div id="delete-tab" class="tab" onclick="showTab('delete')">Удалить</div>
+        {% endif %}
     </div>
     
     <div id="release-content" class="tab-content active">
@@ -188,12 +190,14 @@
         </div>
     {% endif %}
 
-    <div id="delete-content" class="tab-content">
-        <h1>Удалить релиз?</h1>
-        <form action="{{ url_for('client.delete_release', release_id=release.id) }}" method="post">
-            <button type="submit" class="btn red"  onclick="return confirm('Удалить этот релиз?')">Удалить релиз</button>
-        </form>
-    </div>
+    {% if release.status == 0 or release.status == 1 %}
+        <div id="delete-content" class="tab-content">
+            <h1>Удалить релиз?</h1>
+            <form action="{{ url_for('client.delete_release', release_id=release.id) }}" method="post">
+                <button type="submit" class="btn red"  onclick="return confirm('Удалить этот релиз?')">Удалить релиз</button>
+            </form>
+        </div>
+    {% endif %}
 </div>
 </body>
 </html>
